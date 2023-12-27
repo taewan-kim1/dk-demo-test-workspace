@@ -1,0 +1,13 @@
+%dw 2.0
+
+type auto_ee853b97_77c5_4e1c_b60d_2e184f6d709e_Output_Payload = {
+  if_data: {
+    end_dtm: String, 
+    if_nm: String, 
+    if_id: String, 
+    start_dtm: String, 
+    _?: Any
+  }, 
+  _?: Any
+}
+

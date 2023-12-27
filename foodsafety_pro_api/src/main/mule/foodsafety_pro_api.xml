@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+	<flow name="foodsafety_pro_api-main">
+		<http:listener
+			config-ref="foodsafety_pro_api-httpListenerConfig" path="/api/*">
+			<http:response
+				statusCode="#[vars.httpStatus default 200]">
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:response>
+			<http:error-response
+				statusCode="#[vars.httpStatus default 500]">
+				<http:body>#[payload]</http:body>
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:router config-ref="foodsafety_pro_api-config" />
+		<error-handler>
+			<on-error-propagate type="APIKIT:BAD_REQUEST">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">400
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_FOUND">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">404
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate
+				type="APIKIT:METHOD_NOT_ALLOWED">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">405
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">406
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate
+				type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">415
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">501
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="foodsafety_pro_api-console">
+		<http:listener
+			config-ref="foodsafety_pro_api-httpListenerConfig" path="/console/*">
+			<http:response
+				statusCode="#[vars.httpStatus default 200]">
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:response>
+			<http:error-response
+				statusCode="#[vars.httpStatus default 500]">
+				<http:body>#[payload]</http:body>
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:console config-ref="foodsafety_pro_api-config" />
+		<error-handler>
+			<on-error-propagate type="APIKIT:NOT_FOUND">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">404
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow
+		name="get:\v1\DK_IF_E1002_FS001_MD001:foodsafety_pro_api-config">
+		<flow-ref doc:name="Flow Reference" doc:id="e75b49bb-b92f-4d79-b7f3-76c14c122120" name="implementFlow"/>
+		<!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message"> 
+			<ee:message> <ee:set-payload><![CDATA[%dw 2.0 output application/json &#45;&#45;- 
+			{ if_data: { if_id: "asd", if_nm: "bad", start_dtm: "2023-12-19T13:12:49.274Z", 
+			end_dtm: "2023-12-19T13:12:49.274Z" }, if_method: "SUCCESS", req_body: "요청내용", 
+			res_body: "완료내용" } as Object {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload> 
+			</ee:message> </ee:transform> [STUDIO] -->
+	</flow>
+</mule>

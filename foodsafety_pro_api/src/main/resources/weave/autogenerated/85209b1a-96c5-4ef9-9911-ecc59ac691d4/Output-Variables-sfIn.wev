@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_85209b1a_96c5_4ef9_9911_ecc59ac691d4_Output_Variables_sfIn = Array<{|  Name: String,   PRDLST_REPORT_NO__c: String,   PRMS_DT__c: String,   LAST_UPDT_DTM__c: String,   LCNS_NO__c: String,   PRDLST_NM__c: String,   QLITY_MNTNC_TMLMT_DAYCNT__c: String,   BSSH_NM__c: String,   PRDLST_DCNM__c: String,   CHILD_CRTFC_YN__c: String,   INDUTY_CD_NM__c: String,   USAGE__c: String,   POG_DAYCNT__c: String,   HIENG_LNTRT_DVS_NM__c: String,   PRODUCTION__c: String,   PRPOS__c: String|}>
+

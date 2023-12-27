@@ -1,0 +1,15 @@
+# Common properties shared across all environments
+api:
+  name: "${project.artifactId}"
+  version: "${project.version}"
+  autodiscoveryID: "00000000"
+
+# DB Server info
+dbserver:
+  host : "localhost"
+  port : "3306"
+  user : "mulesoft"
+  pass : "a1111"
+  database : "mulesoft" 
+
+  

@@ -1,0 +1,62 @@
+{
+    "I1250": {
+        "total_count": "3",
+        "row": [
+            {
+                "PRDLST_REPORT_NO": "20190324434198",
+                "PRMS_DT": "20200902",
+                "LAST_UPDT_DTM": "20221206",
+                "LCNS_NO": "20190324434",
+                "PRDLST_NM": "101번지 남산돈까스 전용유",
+                "QLITY_MNTNC_TMLMT_DAYCNT": "제조일로부터12개월까지",
+                "BSSH_NM": "(주)오뚜기",
+                "PRDLST_DCNM": "쇼트닝",
+                "CHILD_CRTFC_YN": "",
+                "INDUTY_CD_NM": "식품제조가공업",
+                "USAGE": "각종 튀김용",
+                "POG_DAYCNT": "제조일로부터 12개월",
+                "HIENG_LNTRT_DVS_NM": "해당없음",
+                "PRODUCTION": "아니오",
+                "PRPOS": ""
+            },
+            {
+                "PRDLST_REPORT_NO": "1976052300165",
+                "PRMS_DT": "20190814",
+                "LAST_UPDT_DTM": "20190815",
+                "LCNS_NO": "19760523001",
+                "PRDLST_NM": "1번지옛날통닭전용유",
+                "QLITY_MNTNC_TMLMT_DAYCNT": "",
+                "BSSH_NM": "(주)유맥",
+                "PRDLST_DCNM": "혼합식용유",
+                "CHILD_CRTFC_YN": "",
+                "INDUTY_CD_NM": "식품제조가공업",
+                "USAGE": "식용, 식품가공 및 식품조리용",
+                "POG_DAYCNT": "제조일로부터 24개월(2년)",
+                "HIENG_LNTRT_DVS_NM": "해당없음",
+                "PRODUCTION": "아니오",
+                "PRPOS": ""
+            },
+            {
+                "PRDLST_REPORT_NO": "1993038352271",
+                "PRMS_DT": "20220823",
+                "LAST_UPDT_DTM": "20230610",
+                "LCNS_NO": "19930383522",
+                "PRDLST_NM": "2피자1치킨상회 전용유",
+                "QLITY_MNTNC_TMLMT_DAYCNT": "",
+                "BSSH_NM": "하이브 주식회사",
+                "PRDLST_DCNM": "콩기름(대두유)",
+                "CHILD_CRTFC_YN": "",
+                "INDUTY_CD_NM": "식품제조가공업",
+                "USAGE": "각종 튀김용, 식품 제조용",
+                "POG_DAYCNT": "제조일로부터 18개월까지",
+                "HIENG_LNTRT_DVS_NM": "해당없음",
+                "PRODUCTION": "아니오",
+                "PRPOS": ""
+            }
+        ],
+        "RESULT": {
+            "MSG": "정상처리되었습니다.",
+            "CODE": "INFO-000"
+        }
+    }
+}

@@ -1,0 +1,9 @@
+# Salesforce Security Token 값 (Encrypted)
+encrypted:
+  SFToken: "![BpCXzlQcbu1NjJv5Rnctg1rWw7BnM4N9OiEQ2d5LBgs=]"
+  SFPass: "![LbzOpegD1aBf5kZkd2nQNg==]"
+  SFId: "![PE4SiOFkXKV1/W41vtgD8q3+esF7gjH0]"
+  
+encryptedMQ:
+  MQClientAppId: "![ikjNyNEcb9Q3lY2SUdZClKEsDowa2mUtLGlHajR6qXvXXuj0xcfHIg==]"
+  MQClientSecret: "![b7htOIM5maq7EngCgEVERic3MXC5c9vHyXX91Ok5cWKvq3XmnyGNhA==]" 

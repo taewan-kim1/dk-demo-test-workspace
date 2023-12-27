@@ -1,0 +1,9 @@
+%dw 2.0
+
+type auto_85209b1a_96c5_4ef9_9911_ecc59ac691d4_Input_Variables_headers = {|
+  if_id: String, 
+  if_nm: String, 
+  start_dtm: String, 
+  end_dtm: DateTime
+|}
+

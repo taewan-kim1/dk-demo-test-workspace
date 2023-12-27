@@ -1,0 +1,8 @@
+%dw 2.0
+
+type auto_85209b1a_96c5_4ef9_9911_ecc59ac691d4_Input_Variables_unproResult = Array<org_mule_extension_salesforce_api_bulk_JobUnprocessedRecordResult>
+type org_mule_extension_salesforce_api_bulk_JobUnprocessedRecordResult = {| originalFields?: { _?: String } |} {"typeAlias": "JobUnprocessedRecordResult",
+"typeId": "org.mule.extension.salesforce.api.bulk.JobUnprocessedRecordResult"}
+
+
+

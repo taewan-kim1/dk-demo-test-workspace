@@ -1,0 +1,13 @@
+%dw 2.0
+
+type auto_85209b1a_96c5_4ef9_9911_ecc59ac691d4_Input_Variables_failedResult = Array<org_mule_extension_salesforce_api_bulk_JobFailedRecordResults>
+type org_mule_extension_salesforce_api_bulk_JobFailedRecordResults = {|
+  errorMessage?: String, 
+  id?: String, 
+  originalFields?: { _?: String }
+|} {"typeAlias": "JobFailedRecordResults",
+"class": "org.mule.extension.salesforce.api.bulk.JobFailedRecordResults",
+"typeId": "org.mule.extension.salesforce.api.bulk.JobFailedRecordResults"}
+
+
+

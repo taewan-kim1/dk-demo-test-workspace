@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<http:listener-config
+		name="foodsafety_pro_api-httpListenerConfig">
+		<http:listener-connection host="0.0.0.0"
+			port="8081" />
+	</http:listener-config>
+	<apikit:config name="foodsafety_pro_api-config"
+		api="resource::b9794970-9656-468b-8588-2282da1fe403:foodsafety_pro_api:1.0.0:raml:zip:foodsafety_pro_api.raml"
+		outboundHeadersMapName="outboundHeaders"
+		httpStatusVarName="httpStatus" />
+	<configuration-properties doc:name="Configuration properties" doc:id="1d807a92-b488-4d9b-85fe-5bc4fe1a6a9d" file="config.yaml" />
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="9e138562-6128-4dd3-a3e2-db5c73d1130b" >
+		<salesforce:basic-connection username="${secure::encrypted.SFId}" password="${secure::encrypted.SFPass}" securityToken="${secure::encrypted.SFToken}" />
+	</salesforce:sfdc-config>
+	<anypoint-mq:config name="Anypoint_MQ_Config" doc:name="Anypoint MQ Config" doc:id="ab941902-4fe0-448a-9e8b-acf0af656a71" >
+		<anypoint-mq:connection url="https://mq-ap-northeast-1.anypoint.mulesoft.com/api/v1/organizations/b9794970-9656-468b-8588-2282da1fe403/environments/4e0970ac-7286-436f-a8c4-108180e66d3c" clientId="${secure::encryptedMQ.MQClientAppId}" clientSecret="${secure::encryptedMQ.MQClientSecret}" />
+	</anypoint-mq:config>
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="594438c3-69bf-4e0f-af85-9e09a2f913ae" file="secured-properties.yaml" key="DKBMC" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+
+</mule>

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd">
+	<flow name="implementFlow" doc:id="ee853b97-77c5-4e1c-b60d-2e184f6d709e" >
+		<ee:transform doc:name="INPUT 헤더 정보를 변수에 저장" doc:id="7c123393-4abc-4406-8481-6b700202b174">
+			<ee:message />
+			<ee:variables>
+				<ee:set-variable variableName="headers"><![CDATA[%dw 2.0
+output application/json
+---
+{
+	if_id: attributes.headers.if_id,
+	if_nm: attributes.headers.if_nm,
+	start_dtm: attributes.headers.start_dtm,
+	end_dtm: now() >> "Asia/Seoul"
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<until-successful maxRetries="3" doc:name="10초 간격 3번까지 재시도 (Until Successful)" doc:id="6344dd31-89f5-49c6-a434-39f816c636c8" millisBetweenRetries="10000">
+			<http:request method="GET" doc:name="SYS API에게 OPEN API 데이터 요청" doc:id="1f7f7807-9830-49da-b633-a37e63c9b3dd" url="${sys.url}">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"start_dtm" : vars.headers.start_dtm,
+	"if_nm" : vars.headers.if_nm,
+	"if_id" : vars.headers.if_id
+}]]]></http:headers>
+		</http:request>
+		</until-successful>
+		<logger level="INFO" doc:name="데이터 로깅" doc:id="e83b7702-ebc6-46ed-8965-3212f527013d" message="#[payload]"/>
+		<choice doc:name="데이터 수신 성공 여부" doc:id="1745e027-69bb-4d62-a165-5276cff94301" >
+			<when expression='#[payload.I1250.RESULT.CODE == "INFO-000"]'>
+				<ee:transform doc:name="Salesforce 커스텀 오브젝트 필드명의 csv 형식으로 Transform" doc:id="48b6c503-2fd4-4b54-94a0-46ecf0010f69" >
+					<ee:message >
+					</ee:message>
+					<ee:variables >
+						<ee:set-variable variableName="sfIn" ><![CDATA[%dw 2.0
+output application/csv quoteValues=true
+---
+payload.'I1250'.'row' map {
+	Name: $.PRDLST_NM,
+	PRDLST_REPORT_NO__c: $.PRDLST_REPORT_NO,
+	PRMS_DT__c: $.PRMS_DT,
+	LAST_UPDT_DTM__c: $.LAST_UPDT_DTM,
+	LCNS_NO__c: $.LCNS_NO,
+	PRDLST_NM__c: $.PRDLST_NM,
+	QLITY_MNTNC_TMLMT_DAYCNT__c: $.QLITY_MNTNC_TMLMT_DAYCNT,
+	BSSH_NM__c: $.BSSH_NM,
+	PRDLST_DCNM__c: $.PRDLST_DCNM,
+	CHILD_CRTFC_YN__c: $.CHILD_CRTFC_YN,
+	INDUTY_CD_NM__c: $.INDUTY_CD_NM,
+	USAGE__c: $.USAGE,
+	POG_DAYCNT__c: $.POG_DAYCNT,
+	HIENG_LNTRT_DVS_NM__c: $.HIENG_LNTRT_DVS_NM,
+	PRODUCTION__c: $.PRODUCTION,
+	PRPOS__c: $.PRPOS
+}
+]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<salesforce:create-job-bulk-api-v2 objectType="Food_system__c" doc:name="SFDC에 데이터 저장" doc:id="710c3c6e-eaf8-41e1-87c8-05424476c557" config-ref="Salesforce_Config" operation="upsert" externalIdFieldName='PRDLST_REPORT_NO__c' lineEnding="CRLF" target="sfResult">
+					<salesforce:s-objects><![CDATA[#[vars.sfIn]]]></salesforce:s-objects>
+				</salesforce:create-job-bulk-api-v2>
+				<anypoint-mq:publish doc:name="SFDC Bulk Job ID를 MQ에 게시" doc:id="3fe2b6b3-f053-4e8f-986f-ce87bc00324b" destination="salesforce-Bulk-Id-Exchange" config-ref="Anypoint_MQ_Config" target="publishId">
+					<anypoint-mq:body ><![CDATA[#[vars.sfResult.id]]]></anypoint-mq:body>
+				</anypoint-mq:publish>
+				<logger level="INFO" doc:name="확인용 로거" doc:id="095a19f6-48be-4fa2-a3d3-748e203e6961"/>
+				<flow-ref doc:name="DB SYS API 호출 플로우 (로그 저장)" doc:id="35473dda-4c90-412f-b521-9d87a29e05c5" name="BatchLogFlow"/>
+				<ee:transform doc:name="최종 아웃풋 데이터 형식 구현" doc:id="79bb2d87-bab0-4e9e-8728-4826058b8053" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "if_data": {
+    "if_id": payload.if_data.if_id,
+    "if_nm": payload.if_data.if_nm,
+    "start_dtm": payload.if_data.start_dtm,
+    "end_dtm": payload.if_data.end_dtm
+  },
+  "if_method": if(payload.I1250.RESULT.MSG == "정상처리되었습니다.")  "SUCCESS" else "FAILED",
+  "req_body": "요청내용",
+  "res_body": "완료내용"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="에러처리(로그저장) - 카카오톡 호출 프로세스 구현" doc:id="b936eb90-fde9-4330-b550-f3abe86567fe" />
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="BatchLogFlow" doc:id="85209b1a-96c5-4ef9-9911-ecc59ac691d4" >
+		<ee:transform doc:name="DB SYS API에 전송할 변수 생성" doc:id="5c449ce8-9c85-4083-8fdf-ff07ae72e60c" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="dbVars" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "trs_id": correlationId,
+  "if_id": payload.if_data.if_id,
+  "if_nm": payload.if_data.if_nm,
+  "start_dtm": payload.if_data.start_dtm,
+  "end_dtm": payload.if_data.end_dtm,
+  "responseStatus": if(payload.I1250.RESULT.MSG == "정상처리되었습니다.")  "SUCCESS" else "FAILED",
+  "message": if(payload.I1250.RESULT.CODE == "INFO-000") "Batch End" else "Batch Failed at " ++ payload.if_data.if_nm
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="일단은 변수 로깅까지만 ( 추후 DB SYS API 호출 구현 )" doc:id="bfe8e606-208f-48e7-9fb7-b198f1be9858" message="#[vars.dbVars]"/>
+	</flow>
+	<flow name="implementFlow1" doc:id="a760974c-fbe1-41cb-849f-773d9a0fa1bd" >
+		<scheduler doc:name="Bulk Job 실패한 레코드 확인 플로우 트리거" doc:id="cbf7b7d1-09fa-4e4e-93ac-12fa5d9aeee3" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="100000"/>
+			</scheduling-strategy>
+		</scheduler>
+		<anypoint-mq:consume doc:name="SFDC Bulk Job ID 소비" doc:id="b8ba3a8a-f201-4098-ba06-7adf9024a692" acknowledgementMode="MANUAL" destination="Salesforce-Bulk-Id-Queue" target="sfId" config-ref="Anypoint_MQ_Config" acknowledgementTimeout="10000" targetValue="#[message]" pollingTime="0"/>
+		<set-variable value="#[vars.sfId.attributes.ackToken]" doc:name="Acknowledge Token 저장" doc:id="74bc181f-470a-40c3-b1f4-153825f9f3e7" variableName="ackToken"/>
+		<choice doc:name="MQ에 등록된 메시지가 있는가 / 없는가" doc:id="e01b2a6d-4746-46c0-9a48-1eaa642007be" >
+			<when expression="#[vars.ackToken != null]">
+				<salesforce:retrieve-job-unprocessed-results-bulk-v2 doc:name="Bulk Job 중 아직 처리되지 않은 Result가 있는지 검색" doc:id="f6afbad4-eb40-4994-b25f-f7640320c08c" config-ref="Salesforce_Config" id="#[vars.sfId.payload]" target="unproResult" />
+				<choice doc:name="전부 처리되었는지 / 아직 남았는지" doc:id="fb48e5f7-4d9e-41d2-9ccd-c1dd4f9c033e">
+			<when expression="#[vars.unproResult == []]">
+				<anypoint-mq:ack doc:name="전부 처리되었으므로 MQ 메시지 소비" doc:id="cddc58cd-8878-47c0-b256-83be509662f3" ackToken="#[vars.ackToken]" config-ref="Anypoint_MQ_Config" />
+				<salesforce:retrieve-job-failed-results-bulk-v2 doc:name="실패한 결과가 있는지 검색" doc:id="aee300e2-e6bc-4888-b42f-9747d53ef91d" config-ref="Salesforce_Config" id="#[vars.sfId.payload]" target="failedResult" />
+				<ee:transform doc:name="로깅용(추후 DB 삽입용) 변수 생성" doc:id="c2781fbe-4f4c-46a4-83d6-778b892ee4a3">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="failedNum"><![CDATA[%dw 2.0
+output text/plain
+---
+"실패한 레코드 수 : " ++ sizeOf(vars.failedResult) ++ "개"]]></ee:set-variable>
+						<ee:set-variable variableName="failedId"><![CDATA[%dw 2.0
+output text/plain
+---
+"에러가 발생한 Bulk Job Id : " ++ vars.sfId.payload]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<logger level="INFO" doc:name="실패한 Bulk Job ID와 실패한 갯수 로깅" doc:id="01ccc25c-52c7-4d54-9356-5c78d55a2724" message='#[vars.failedNum ++ "\n" ++ vars.failedId]' />
+			</when>
+			<otherwise>
+				<anypoint-mq:nack doc:name="아직 다 처리하지 못했으므로, 메시지를 다시 큐로 전송" doc:id="671e8e8b-086f-4cd9-be34-aa7339aa5340" ackToken="#[vars.ackToken]" config-ref="Anypoint_MQ_Config" />
+			</otherwise>
+		</choice>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="MQ에 등록된 메시지가 없는 경우 단순 메시지 로깅" doc:id="1f27d07f-2fcf-49e9-bd9c-e96d75ba1293" message="현재 MQ에 등록된 Bulk Job ID가 없습니다." />
+			</otherwise>
+		</choice>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="5ae5d142-7776-4df2-ab20-3963712476e7" type="ANY">
+				<logger level="ERROR" doc:name="Logger" doc:id="5bba32dd-4deb-40e1-a55f-7e780a4627d4" />
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>
