@@ -1,0 +1,23 @@
+%dw 2.0
+
+type auto_18e8f78c_60d9_4f3a_a0b9_91d7465fec7d_Output_Payload = {
+  if_data: {
+    end_dtm: String, 
+    if_nm: String, 
+    if_id: String, 
+    start_dtm: String, 
+    _?: Any
+  }, 
+  I1250: {
+    total_count: String, 
+    row: Array<{      PRDLST_REPORT_NO: String,       PRMS_DT: String,       LAST_UPDT_DTM: String,       LCNS_NO: String,       PRDLST_NM: String,       QLITY_MNTNC_TMLMT_DAYCNT?: String,       BSSH_NM: String,       PRDLST_DCNM: String,       CHILD_CRTFC_YN: "" | "Y" | "N",       INDUTY_CD_NM: String,       USAGE: String,       POG_DAYCNT: String,       HIENG_LNTRT_DVS_NM: String,       PRODUCTION: String,       PRPOS?: String,       _?: Any    }>, 
+    RESULT: {
+      MSG: String, 
+      CODE: String, 
+      _?: Any
+    }, 
+    _?: Any
+  } {"description": "데이터 본문입니다."}, 
+  _?: Any
+} {"description": "Foodsafety SYS API의 응답 메시지의 유형입니다."}
+

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="RequestFoodSafety" doc:id="18e8f78c-60d9-4f3a-a0b9-91d7465fec7d" >
+		<ee:transform doc:name="Save headers to variable" doc:id="1847a1f8-772a-4280-9d6a-f4ef2d2a6f47" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="headers" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	if_id: attributes.headers.if_id,
+	if_nm: attributes.headers.if_nm,
+	start_dtm: attributes.headers.start_dtm,
+	end_dtm: now() >> 'Asia/Seoul'
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="Building the URL from config.yaml" doc:id="90dc5fd3-2206-45dd-ac01-ebc997bb7ca1" name="BuildingURL" />
+		<until-successful maxRetries="3" doc:name="Until Successful - Retry Max " doc:id="9d115bcc-4a43-4cf1-8bee-e1b2b9fbb251" millisBetweenRetries="10000" >
+			<http:request method="GET" doc:name="Request to Foodsafety.org" doc:id="f8da3c01-945d-4724-adf5-07fc21c05e44" url="#[payload.final]" sendBodyMode="AUTO" />
+		</until-successful>
+		<ee:transform doc:name="Transform Message" doc:id="37ab6941-2308-4cd7-ae83-ad5444bf3cdb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	if_data: {
+		end_dtm: vars.headers.end_dtm as String,
+		if_nm: vars.headers.if_nm,
+		if_id: vars.headers.if_id,
+		start_dtm: vars.headers.start_dtm
+	},
+	I1250: payload.I1250
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logging payload" doc:id="72723f4a-dac2-436b-a3e6-c40a2c7fea6e" message="#[payload]" />
+	</flow>
+	<sub-flow name="BuildingURL" doc:id="e125d7dd-47fa-410b-bf72-7e8a0834daa0" >
+		<ee:transform doc:name="Building Full URL" doc:id="cfda7c1b-9711-4c68-a97e-65bb5eb3365f" >
+			<ee:message />
+			<ee:variables >
+				<ee:set-variable variableName="url" ><![CDATA[%dw 2.0
+import * from dw::core::URL
+output application/java
+---
+{
+	fullUrl: encodeURI(p('url.host') ++ p('secure::encrypted.keyId') ++ "/" ++ p('url.serviceId') ++ "/" ++ p('url.dataType') ++ "/" ++ p('url.startIdx') ++ "/" ++ p('url.endIdx') ++ "/" ++
+	(if(isEmpty(p('url.CHNG_DT'))) "" else "CHNG_DT=" ++ p('url.CHNG_DT') ++ "&") ++
+	(if(isEmpty(p('url.PRDLST_REPORT_NO'))) "" else "PRDLST_REPORT_NO=" ++ p('url.PRDLST_REPORT_NO') ++ "&") ++
+	(if(isEmpty(p('url.BSSH_NM'))) "" else "BSSH_NM=" ++ p('url.BSSH_NM') ++ "&") ++
+	(if(isEmpty(p('url.PRDLST_NM'))) "" else "PRDLST_NM=" ++ p('url.PRDLST_NM') ++ "&") ++
+	(if(isEmpty(p('url.LCNS_NO'))) "" else "LCNS_NO=" ++ p('url.LCNS_NO') ++ "&") ++
+	(if(isEmpty(p('url.PRMS_DT'))) "" else "PRMS_DT=" ++ p('url.PRMS_DT') ++ "&") ++
+	(if(isEmpty(p('url.PRDLST_DCNM'))) "" else "PRDLST_DCNM=" ++ p('url.PRDLST_DCNM') ++ "&"))
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name='Trim last "&amp;"' doc:id="909b79e7-31e0-4240-928a-d91fb8c8bc0e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+output application/java
+---
+{
+	final : if(vars.url.fullUrl[sizeOf(vars.url.fullUrl) - 1] == "&") substringBeforeLast(vars.url.fullUrl, vars.url.fullUrl[sizeOf(vars.url.fullUrl)-1]) else vars.url.fullUrl
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

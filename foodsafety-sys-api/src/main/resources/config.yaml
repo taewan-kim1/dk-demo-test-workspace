@@ -1,0 +1,15 @@
+# 식품의약품안전처의 OPEN API를 이용하여 품목제조보고 중 "전용유" 정보를 받아오기 위한 url 정보
+url:
+  host: "http://openapi.foodsafetykorea.go.kr/api/"
+  serviceId: "I1250"
+# dataType = "json" or "xml"
+  dataType: "json"
+  startIdx: "1"
+  endIdx: "3"
+  CHNG_DT: ""
+  PRDLST_REPORT_NO: ""
+  BSSH_NM: ""
+  PRDLST_NM: "전용유"
+  LCNS_NO: ""
+  PRMS_DT: ""
+  PRDLST_DCNM: ""
