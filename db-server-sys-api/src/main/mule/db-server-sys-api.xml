@@ -120,9 +120,9 @@ output application/json
         </error-handler>
     </flow>
     <flow name="get:\v1\getSidoSggCd:db-server-sys-api-config">
-        <flow-ref doc:name="Flow Reference" doc:id="5e091948-f829-4712-8b33-aecc78591095" name="getSidoSggCd" />
+		<flow-ref doc:name="Flow Reference" doc:id="1cee9b74-e4fd-47ac-9d77-1c2a4555c0d1" name="getSidoSggCd"/>
     </flow>
     <flow name="post:\v1\batchLog:application\json:db-server-sys-api-config">
-        <flow-ref doc:name="Flow Reference" doc:id="1ff2f3c8-e37b-40a6-a892-5b61b208c64e" name="batchLog" />
+		<flow-ref doc:name="Flow Reference" doc:id="66c89abb-4d29-45b8-8c1f-2cda25c6f964" name="batchLog"/>
     </flow>
 </mule>
