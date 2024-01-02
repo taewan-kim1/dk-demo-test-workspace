@@ -3,3 +3,5 @@
 */.gitignore
 */target/*
 */.settings
+.tooling/*
+.tooling-apps-cache/*

@@ -3,4 +3,8 @@ api:
   name: "${project.artifactId}"
   version: "${project.version}"
   autodiscoveryID: "00000000"
-  
+ 
+salesforce:
+  username: ""
+  password: "" 
+  token: ""

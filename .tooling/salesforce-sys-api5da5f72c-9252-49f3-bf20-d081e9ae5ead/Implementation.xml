@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
-	<flow name="getCustRisk" doc:id="b75ff4c8-5c64-4fe6-93af-9ff9be80b7b9" >
-		<logger level="INFO" doc:name="Logger" doc:id="e5020b93-dd26-442d-8c93-f3ac16a24fae" />
-	</flow>
-</mule>
