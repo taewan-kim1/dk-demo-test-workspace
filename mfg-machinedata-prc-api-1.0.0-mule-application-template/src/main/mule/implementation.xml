@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:validation="http://www.mulesoft.org/schema/mule/validation"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="implementation_post-osipi-machinedata" doc:id="391d5cdc-b6e9-4c18-bccb-8c8019688071" >
+		<logger level="INFO" doc:name="Start of transaction" doc:id="2ce289a7-feb5-49f4-84ee-5c796dc494c6" message="Start of transaction for transaction-id #[vars.transactionId]" />
+		<flow-ref doc:name="implementation_get-machinedata-from-osipi" doc:id="02ba042c-3876-4345-9d0b-10b971bb98e8" name="implementation_get-machinedata-from-osipi"/>
+		<logger level="INFO" doc:name="End of transaction" doc:id="e7e100ec-1e21-4dfb-8e3c-5d1c7e2869e8" message="End of transaction for transaction-id #[vars.transactionId]" />
+	</sub-flow>
+	<flow name="implementation_machinedata-poller" doc:id="619d7d3a-8df7-4fa6-9d80-7b11ee9b3675">
+		<scheduler doc:name="Machine Data Scheduler" doc:id="54d9863b-608d-40c2-ae8d-e2c967b598ae" >
+			<scheduling-strategy >
+				<fixed-frequency frequency="${pi.scheduler-frequency}" timeUnit="MINUTES" />
+			</scheduling-strategy>
+		</scheduler>
+		<set-variable value='#[attributes."x-correlation-id" default correlationId]' doc:name="TransactionId" doc:id="8a5b9672-e9c7-451b-9a16-8423708509bb" variableName="transactionId" />
+		<logger level="INFO" doc:name="Start of transaction" doc:id="7ab0b9f5-3ffa-4c6d-93b0-7a86c95cccda" message="Start of transaction for transaction-id #[vars.transactionId]"/>
+		<flow-ref doc:name="implementation_get-machinedata-from-osipi" doc:id="76aa47da-baf8-426f-8290-ca4b54970cd3" name="implementation_get-machinedata-from-osipi" />
+		<logger level="INFO" doc:name="End of transaction" doc:id="472a785b-cfc5-4e0b-b8a0-e60950ca726e" message="End of transaction for transaction-id #[vars.transactionId]"/>
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="Capture Http Errors" doc:id="6d18aa1a-c650-4ca0-9a7b-c55f7df09fab" >
+				<flow-ref doc:name="common-error-handler_http-exception" doc:id="0f0d1bc3-9af2-43dc-b2a5-9784a270286d" name="common-error-handler_http-exception" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<sub-flow name="implementation_get-machinedata-from-osipi" doc:id="e95c1e9e-7d2b-4de0-8346-1c031611def9" >
+		<ee:transform doc:name="Create OSI PI Request" doc:id="c96fb648-e0c8-49a8-ba29-6fcbdcb69006">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+if(isEmpty(payload)) 
+	readUrl("classpath://data/osipi-machinedata-points.json","application/json")
+else
+	payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Log Payload" doc:id="9c84d006-2912-45b9-93d9-3262b435e3e3" message='"The Request Payload for OSPI PI call is " ++ #[payload]' />
+		<http:request method="POST" doc:name="Get Shop Data From OSI PI" doc:id="8c5c5262-8444-41cb-8aa1-eb592a0e4afb" config-ref="mfg-osipi-machinedata-sys-httpRequestConfig" path="${mfg-osipi-machinedata-sys.points-path}"/>
+		<ee:transform doc:name="Create Shop Data Request" doc:id="015c3463-c2d2-4027-84df-ea16888d469f" >
+			<ee:message >
+				<ee:set-payload resource="dwl/createMachineDataRequest.dwl" />
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Insert Machine Data into RedShift" doc:id="3e676563-0df6-4f79-ac27-35cbc50edf63" config-ref="mfg-dw-machinedata-sys-httpRequestConfig" path="${mfg-dw-machinedata-sys.create-data-path}"/>
+		<ee:transform doc:name="Success Response" doc:id="12894986-30ef-467d-8b87-ee0a9ec8bbe3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	responseStatus: "SUCCESS"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

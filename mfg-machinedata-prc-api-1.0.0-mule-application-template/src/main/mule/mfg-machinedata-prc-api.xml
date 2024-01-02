@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    
+    <flow name="mfg-machinedata-prc-api-main">
+        <http:listener config-ref="mfg-machinedata-prc-api-httpListenerConfig" path="/api/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <set-variable value='#[attributes."x-correlation-id" default correlationId]' doc:name="TransactionId" doc:id="e145e16e-ebe2-4a25-8c04-14868ed2ed02" variableName="transactionId" />
+		<apikit:router config-ref="mfg-machinedata-prc-api-config" />
+		<error-handler ref="error-handler_common" />
+    </flow>
+    <flow name="mfg-machinedata-prc-api-console">
+        <http:listener config-ref="mfg-machinedata-prc-api-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="mfg-machinedata-prc-api-config" />
+		<error-handler ref="error-handler_common" />
+    </flow>
+    <flow name="get:\ping:mfg-machinedata-prc-api-config">
+        <flow-ref doc:name="ping_get-health" doc:id="52615661-5cf3-4257-9b3a-e84e65a89e44" name="ping_get-health"/>
+    </flow>
+    <flow name="post:\osipi\machineData:mfg-machinedata-prc-api-config">
+		<flow-ref doc:name="implementation_post-osipi-machinedata" doc:id="d062028f-2fb9-43bc-955b-04f36e8fe243" name="implementation_post-osipi-machinedata"/>
+    </flow>
+</mule>

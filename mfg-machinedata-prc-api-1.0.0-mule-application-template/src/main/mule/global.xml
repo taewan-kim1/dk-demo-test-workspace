@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule  xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:accelerator-manufacturing="http://www.mulesoft.org/schema/mule/accelerator-manufacturing"
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd 
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd 
+http://www.mulesoft.org/schema/mule/accelerator-manufacturing 
+http://www.mulesoft.org/schema/mule/accelerator-manufacturing/current/mule-accelerator-manufacturing.xsd 
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+
+    <http:listener-config name="mfg-machinedata-prc-api-httpListenerConfig">
+        <http:listener-connection host="${https.host}" port="${https.port}" protocol="HTTPS" readTimeout="300000" tlsContext="common-selfsigned_tlsContext"/>
+    </http:listener-config>
+    
+    <apikit:config name="mfg-machinedata-prc-api-config" api="resource::org.mule.examples:mfg-machinedata-prc-api-spec:1.0.0:raml:zip:mfg-machinedata-prc-api-spec.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	
+	<accelerator-manufacturing:config
+		name="accelerator-manufacturing-config" doc:name="Accelerator manufacturing Config"
+		doc:id="f0929e0d-5b98-4717-83d0-f459e4fa49c4" apiName="${api.name}"
+		apiVersion="${api.version}" />
+	
+	<global-property doc:name="global-property-mule.env"
+		doc:id="5c2b8274-6ce1-448e-911c-c1cb9380cc74" name="mule.env"
+		value="local" />
+		
+	<global-property doc:name="global-property-mule.key"
+		doc:id="632b3e28-0a3e-41b6-880e-c39997aafdde" name="mule.key"
+		value="Salesforce123456" />
+		
+	<configuration-properties
+		doc:name="configuration-properties"
+		doc:id="f73ca0e3-eec6-46f2-9f5c-78a963e29050"
+		file="config/config.yaml" />
+		
+	<configuration-properties
+		doc:name="configuration-properties-env"
+		doc:id="4c53451b-2aa3-4b30-8419-213d042cec64"
+		file="config/config-${mule.env}.yaml" />
+		
+	<secure-properties:config
+		name="configuration-properties-secured-env"
+		doc:name="configuration-properties-secured-env"
+		doc:id="d76480d5-e974-413d-be42-3a2871214a49"
+		file="config/config-secured-${mule.env}.yaml" key="${mule.key}" />
+		
+	<import doc:name="import-global-common.xml"
+		doc:id="834c1759-365c-4bd0-80ac-49d2e4d99741" file="global-common.xml" />
+		
+	<import doc:name="import-common-error-handler.xml"
+		doc:id="26c5e93d-5bf0-4f6d-b39f-79c4b04b3792"
+		file="common-error-handler.xml" />
+		
+	<http:request-config name="mfg-osipi-machinedata-sys-httpRequestConfig" doc:name="HTTP Request configuration" doc:id="59e26bfc-3924-45b7-b67c-b3b55597a4d2" basePath="${mfg-osipi-machinedata-sys.base-path}">
+		<http:request-connection protocol="HTTPS" host="${mfg-osipi-machinedata-sys.host}" port="${mfg-osipi-machinedata-sys.port}" connectionIdleTimeout="${connection.idle-timeout}" tlsContext="common-selfsigned_tlsContext">
+			<reconnection >
+				<reconnect frequency="${connection.frequency}" count="${connection.attempts}" />
+			</reconnection>
+			<http:authentication >
+				<http:basic-authentication username="${mfg-machinedata-prc-api.http-client.client-id}" password="${mfg-machinedata-prc-api.http-client.client-secret}"/>
+			</http:authentication>
+		</http:request-connection>
+	</http:request-config>
+	
+	<http:request-config name="mfg-dw-machinedata-sys-httpRequestConfig" doc:name="HTTP Request configuration" doc:id="ed20a0d6-d970-4325-9e01-4d6ad6d39781" basePath="${mfg-dw-machinedata-sys.base-path}">
+		<http:request-connection protocol="HTTPS" host="${mfg-dw-machinedata-sys.host}" port="${mfg-dw-machinedata-sys.port}" connectionIdleTimeout="${connection.idle-timeout}" tlsContext="common-selfsigned_tlsContext">
+			<reconnection >
+				<reconnect frequency="${connection.frequency}" count="${connection.attempts}" />
+			</reconnection>
+			<http:authentication >
+				<http:basic-authentication username="${mfg-machinedata-prc-api.http-client.client-id}" password="${mfg-machinedata-prc-api.http-client.client-secret}"/>
+			</http:authentication>
+		</http:request-connection>
+	</http:request-config>
+	
+	<!-- <api-gateway:autodiscovery apiId="${api.autodiscoveryID}" ignoreBasePath="true" 
+		doc:name="API Autodiscovery" doc:id="99974e38-99ca-4e39-8a14-f8451597b96d" 
+		flowRef="mainflow" /> -->
+
+</mule>

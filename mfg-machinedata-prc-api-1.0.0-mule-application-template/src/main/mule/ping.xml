@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="ping_get-health"
+		doc:id="a54e7d6d-60c9-4d58-9a42-40855e767c6a">
+		<set-variable
+			value='#[attributes.queryParams.checkDependencies == "true" default false]'
+			doc:name="checkDependencies"
+			doc:id="bffeb0c6-510d-4e08-a4e0-1269803604ec"
+			variableName="checkDependencies" />
+		<choice doc:name="Choice for check dependencies"
+			doc:id="245af207-4b50-47d8-ac4d-87e6f48301fc">
+			<when expression="#[vars.checkDependencies]">
+				<flow-ref doc:name="ping_check-dependencies"
+					doc:id="ba480201-c8d2-4ce9-8729-6e106320e45d"
+					name="ping_check-dependencies" target="dependencyList" />
+			</when>
+			<otherwise>
+				<set-variable doc:name="dependencyList"
+					doc:id="67da54ed-1bf9-40f6-bbe6-41162a3e37f6"
+					variableName="dependencyList" value="#[null]" />
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Map Response"
+			doc:id="38321d86-8900-4b73-8db9-bb47908f4faf">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+var outputPayload = if(vars.dependencyList != null) flatten(vars.dependencyList..payload) else null
+fun getDependencyStatus(dependencyResponse) = if(sizeOf(dependencyResponse.status find "UP") == sizeOf(dependencyResponse))
+    "OK"
+else if (sizeOf(dependencyResponse.status find "DOWN") == sizeOf(dependencyResponse))
+    "OFFLINE"
+else
+    "DEGRADED"
+output application/json
+---
+{
+	status: if(vars.checkDependencies == true) getDependencyStatus(outputPayload) else "OK",
+	apiName: p("api.name") default "",
+	apiVersion: p("api.version") default "",
+	(dependencies: outputPayload map(item) -> {
+		name: item.name default "",
+		status: item.status default ""
+	})
+	if(outputPayload != null)
+} ]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="200" doc:name="httpStatus"
+			doc:id="d1a76d34-db2f-4094-8e05-0100b67eb042"
+			variableName="httpStatus" />
+	</sub-flow>
+	<sub-flow name="ping_check-dependencies"
+		doc:id="b78391ad-a9b4-4055-94c0-29aaf6d40f25">
+		<scatter-gather doc:name="Scatter-Gather" doc:id="c741292c-db63-4f10-8745-cfe0a7328224" >
+			<route >
+				<flow-ref doc:name="ping_osipi-machinedata-sys-dependency" doc:id="34125e0d-0764-4191-b387-8279ec590b77" name="ping_osipi-machinedata-sys-dependency"/>
+			</route>
+			<route >
+				<flow-ref doc:name="ping_dw-machinedata-sys-dependency" doc:id="70a9cd79-bedd-4440-b4a2-c2600a3ba60a" name="ping_dw-machinedata-sys-dependency"/>
+			</route>
+		</scatter-gather>
+	</sub-flow>
+	<sub-flow name="ping_osipi-machinedata-sys-dependency" doc:id="d0503455-8fe2-424d-8a1e-8ebb2295dfa2" >
+		<set-variable value="${mfg-osipi-machinedata-sys.host}" doc:name="sysCheckHost" doc:id="265e951e-3c66-412b-abe7-18c9d490ba62" variableName="sysCheckHost" />
+		<try doc:name="OSIPI MachineData System API Call" doc:id="1c8e8fc7-7285-4b39-99d8-4052169d17b4" >
+			<http:request method="GET" doc:name="OSIPI MachineData Sys API" doc:id="c6e49087-1f11-4724-81b5-163155012528" config-ref="mfg-osipi-machinedata-sys-httpRequestConfig" path="/ping" sendCorrelationId="AUTO" correlationId="#[correlationId]" >
+				<reconnect />
+			</http:request>
+			<set-variable value="#['UP']" doc:name="backendSystemStatus_Up" doc:id="c70eed6a-5b94-4031-adf8-9614d6e3de44" variableName="backendSystemStatus" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="HTTP Error" doc:id="53d71662-cfed-4e3b-b4d5-5fc1162278f6" type="HTTP:METHOD_NOT_ALLOWED" >
+					<set-variable value="#['UP']" doc:name="backendSystemStatus_Up" doc:id="0c077d40-1781-4f50-9580-9520efaefbe3" variableName="backendSystemStatus" />
+				</on-error-continue>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="HTTP Error" doc:id="03211912-bb7c-4802-b830-c72ec2a8cf2b" type="HTTP:BAD_GATEWAY, HTTP:CONNECTIVITY" >
+					<set-variable value="#['DOWN']" doc:name="backendSystemStatus_Down" doc:id="2bdc28a1-cc03-4e42-91aa-3affe4e3af84" variableName="backendSystemStatus" />
+				</on-error-continue>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="HTTP Error" doc:id="2b7f599a-9149-4b67-aa1a-63bf9ec32551" type="ANY" >
+					<set-variable value="#['ERROR']" doc:name="backendSystemStatus_Error" doc:id="b5b8cba6-7eb3-4a37-8aef-dd43edc344f0" variableName="backendSystemStatus" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<ee:transform doc:name="Dependency Status Response" doc:id="afd0a38d-d0bf-48ed-8d55-b24556491de2" >
+			<ee:message >
+				<ee:set-payload resource="dwl/ping-check-dependency-sys-api-response.dwl" />
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="ping_dw-machinedata-sys-dependency" doc:id="f61b0608-ef1b-4cf7-b29d-3cff7acc1c32" >
+		<set-variable value="${mfg-dw-machinedata-sys.host}" doc:name="sysCheckHost" doc:id="7399beb4-d1b1-4c9b-9489-1fded2479756" variableName="sysCheckHost" />
+		<try doc:name="DW MachineData System API Call" doc:id="18ce2abb-2cf4-4f5c-9188-86985306325d" >
+			<http:request method="GET" doc:name="DW MachineData Sys API" doc:id="2d486c71-f289-4e09-bbbc-4aa8fd3b39f3" config-ref="mfg-dw-machinedata-sys-httpRequestConfig" path="/ping" sendCorrelationId="AUTO" correlationId="#[correlationId]" >
+				<reconnect />
+			</http:request>
+			<set-variable value="#['UP']" doc:name="backendSystemStatus_Up" doc:id="7a3eb2e3-3767-48ea-9b13-28e1f1781cdb" variableName="backendSystemStatus" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="HTTP Error" doc:id="256d69bc-ea5d-46e3-a768-e60904af22ee" type="HTTP:METHOD_NOT_ALLOWED" >
+					<set-variable value="#['UP']" doc:name="backendSystemStatus_Up" doc:id="408aa370-3849-4fb0-8f89-9ce2105a1377" variableName="backendSystemStatus" />
+				</on-error-continue>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="HTTP Error" doc:id="0717b76f-9f8e-4802-a37e-2daa8dacb1d6" type="HTTP:BAD_GATEWAY, HTTP:CONNECTIVITY" >
+					<set-variable value="#['DOWN']" doc:name="backendSystemStatus_Down" doc:id="89d8d9a1-c176-4925-a5cb-898480801b8a" variableName="backendSystemStatus" />
+				</on-error-continue>
+				<on-error-continue enableNotifications="true" logException="true" doc:name="HTTP Error" doc:id="e8ae0d57-2ab1-4e34-a84c-090840ccedf5" type="ANY" >
+					<set-variable value="#['ERROR']" doc:name="backendSystemStatus_Error" doc:id="fbfe0186-c0b6-4d56-bf53-05d7fadb270d" variableName="backendSystemStatus" />
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<ee:transform doc:name="Dependency Status Response" doc:id="64906608-86cd-4624-b3ff-33a35edff46a" >
+			<ee:message >
+				<ee:set-payload resource="dwl/ping-check-dependency-sys-api-response.dwl" />
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

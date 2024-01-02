@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="3b227005-3d6a-42d2-81c7-50823b665414" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="0eeadea9-05e1-47a7-a757-876be4ec1335" />
+	<flow name="kakao-alarm-result-sys-main" doc:id="8b173479-185e-45ca-8c8a-11acc060f780" >
+		<http:listener doc:name="Listener" doc:id="6163c51a-e452-4103-9cc6-c7069b51bfea" config-ref="HTTP_Listener_config" path="*/kakaoResult"/>
+		<logger level="INFO" doc:name="Success Input messages" doc:id="456a3217-0f06-4d1d-a01a-f7e1a59504d5" message="Success Input messages"/>
+		<ee:transform doc:name="Transform Message" doc:id="c5178872-9b57-4c89-8abb-812b307fb538" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="GET" doc:name="Request" doc:id="01788e0f-48cf-429c-b63c-90e7892875ee" config-ref="HTTP_Request_configuration" path="/result/ok"/>
+		<ee:transform doc:name="Transform Message" doc:id="12049b3a-4cb4-482a-9b11-068933cccaa3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Success Output messages" doc:id="83636ede-4c27-4d2a-bbd1-3f3fd8b1f314" message="Success Output messages"/>
+	</flow>
+</mule>

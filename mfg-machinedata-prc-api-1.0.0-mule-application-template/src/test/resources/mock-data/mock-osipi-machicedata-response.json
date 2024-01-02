@@ -1,0 +1,97 @@
+[
+    {
+        "attributes": {
+            "webId": "F1DPeksASLKpm0Ss-igNikjrIAAQAAAARUMyQU1BWi1RTlYyTkJKXFZJQlJBVElPTiBERUxUQQ",
+            "id": 1,
+            "tagName": "Vibration Delta",
+            "descriptor": "Machine1",
+            "dataType": "Int32",
+            "units": "Hz",
+            "span": 1000.0,
+            "zero": 10.0,
+            "displayDigits": -5,
+            "link": "https://ec2-35-183-116-105.ca-central-1.compute.amazonaws.com/piwebapi/points/F1DPeksASLKpm0Ss-igNikjrIAAQAAAARUMyQU1BWi1RTlYyTkJKXFZJQlJBVElPTiBERUxUQQ"
+        },
+        "data": {
+            "timestamp": "2022-08-10T18:35:56Z",
+            "value": 5,
+            "good": true
+        }
+    },
+    {
+        "attributes": {
+            "webId": "F1DPeksASLKpm0Ss-igNikjrIAAgAAAARUMyQU1BWi1RTlYyTkJKXFRFTVBFUkFUVVJF",
+            "id": 2,
+            "tagName": "Temperature",
+            "descriptor": "Machine1",
+            "dataType": "Int32",
+            "units": "F",
+            "span": 160.0,
+            "zero": 90.0,
+            "displayDigits": -5,
+            "link": "https://ec2-35-183-116-105.ca-central-1.compute.amazonaws.com/piwebapi/points/F1DPeksASLKpm0Ss-igNikjrIAAgAAAARUMyQU1BWi1RTlYyTkJKXFRFTVBFUkFUVVJF"
+        },
+        "data": {
+            "timestamp": "2022-08-10T18:33:39Z",
+            "value": 81,
+            "good": true
+        }
+    },
+    {
+        "attributes": {
+            "webId": "F1DPeksASLKpm0Ss-igNikjrIAAwAAAARUMyQU1BWi1RTlYyTkJKXE9JTCBMRVZFTA",
+            "id": 3,
+            "tagName": "Oil Level",
+            "descriptor": "Machine1",
+            "dataType": "Int32",
+            "units": "Percentage",
+            "span": 100.0,
+            "zero": 0.0,
+            "displayDigits": -5,
+            "link": "https://ec2-35-183-116-105.ca-central-1.compute.amazonaws.com/piwebapi/points/F1DPeksASLKpm0Ss-igNikjrIAAwAAAARUMyQU1BWi1RTlYyTkJKXE9JTCBMRVZFTA"
+        },
+        "data": {
+            "timestamp": "2022-08-10T18:41:39Z",
+            "value": 0,
+            "good": true
+        }
+    },
+    {
+        "attributes": {
+            "webId": "F1DPeksASLKpm0Ss-igNikjrIABAAAAARUMyQU1BWi1RTlYyTkJKXE5PSVNFIExFVkVM",
+            "id": 4,
+            "tagName": "Noise Level",
+            "descriptor": "Machine1",
+            "dataType": "Int32",
+            "units": "Decibels",
+            "span": 160.0,
+            "zero": 70.0,
+            "displayDigits": -5,
+            "link": "https://ec2-35-183-116-105.ca-central-1.compute.amazonaws.com/piwebapi/points/F1DPeksASLKpm0Ss-igNikjrIABAAAAARUMyQU1BWi1RTlYyTkJKXE5PSVNFIExFVkVM"
+        },
+        "data": {
+            "timestamp": "2022-08-10T18:41:09Z",
+            "value": 66,
+            "good": true
+        }
+    },
+    {
+        "attributes": {
+            "webId": "F1DPeksASLKpm0Ss-igNikjrIABgAAAARUMyQU1BWi1RTlYyTkJKXE1BSU5URU5BTkNFIFNUQVRVUw",
+            "id": 6,
+            "tagName": "Maintenance Status",
+            "descriptor": "Machine1",
+            "dataType": "Digital",
+            "units": "",
+            "span": 1.0,
+            "zero": 5.0,
+            "displayDigits": -5,
+            "link": "https://ec2-35-183-116-105.ca-central-1.compute.amazonaws.com/piwebapi/points/F1DPeksASLKpm0Ss-igNikjrIABgAAAARUMyQU1BWi1RTlYyTkJKXE1BSU5URU5BTkNFIFNUQVRVUw"
+        },
+        "data": {
+            "timestamp": "2022-08-10T18:41:39Z",
+            "value": 0,
+            "good": true
+        }
+    }
+]

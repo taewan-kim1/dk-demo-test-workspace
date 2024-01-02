@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="getSidoSggCd"
+		doc:id="0f8bee89-0600-4927-adbb-9724ccc36653">
+		<logger level="INFO" doc:name="Start of transaction"
+			doc:id="8459b2ca-cb2f-4579-8a0a-1dcb2e4434ab"
+			message="tart of transaction for transaction-id #[vars.transactionId]" />
+		<db:select doc:name="Select"
+			doc:id="312ddca1-11c4-43b2-bfd8-c2d05c179d75"
+			config-ref="Database_Config">
+			<db:sql><![CDATA[select * from tb_m_sido_sgg_code]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message"
+			doc:id="de2177f1-f555-4153-b041-3180c78f839d">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	resultStatus: "SUCCESS",
+	resultMessages: "",
+	sidoSggCd: payload map ( payload01 , indexOfPayload01 ) -> {
+		sido_code: payload01.sido_code,
+		sido_nm: payload01.sido_nm,
+		sgg_code: payload01.sgg_code,
+		sgg_nm: payload01.sgg_nm
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="batchLog"
+		doc:id="8c4ee0d8-5076-4a8a-b5a0-73abf394d91c">
+		<logger level="INFO" doc:name="Start of transaction"
+			doc:id="f280e558-5afe-4d48-84c2-4bdfbb7e62d6"
+			message="tart of transaction for transaction-id #[vars.transactionId]" />
+		<ee:transform doc:name="BatchLog Insert Request Payload"
+			doc:id="66685720-1017-4c6e-ab51-46d65a7ab46f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"trs_id" : payload.trs_id,
+	"if_id" : payload.if_id,
+	"start_dtm" : payload.start_dtm,
+	"end_dtm" : payload.end_dtm,
+	"if_method" : payload.responseStatus,
+	"res_body" : payload.message	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger"
+			doc:id="bc0cbdc4-0450-4d1b-8531-a4c1e8a30b41" message="#[payload]" />
+		<try doc:name="Insert into tb_m_interface_log"
+			doc:id="795b0e5b-c570-46f9-9b1d-266de29f6cc4">
+			<db:insert doc:name="Insert"
+				doc:id="d074ce78-5887-46fb-b4da-4799ba3f1add"
+				config-ref="Database_Config">
+				<db:sql><![CDATA[INSERT INTO mulesoft.tb_m_interface_log(
+trs_id,if_id,start_dtm,end_dtm,if_method,req_body,res_body,create_date)
+VALUES
+(:trs_id,:if_id,:start_dtm,:end_dtm,:if_method,:req_body,:res_body,NOW())]]></db:sql>
+				<db:input-parameters><![CDATA[#[{trs_id: payload.trs_id, if_id: payload.if_id, start_dtm: payload.start_dtm, end_dtm: payload.end_dtm, if_method: payload.if_method, req_body: payload.req_body, res_body: payload.res_body}]]]></db:input-parameters>
+			</db:insert>
+		</try>
+		<choice doc:name="Check for insert success or failure???"
+			doc:id="43bc6eff-c950-42d7-ac5b-9a675107fc15">
+			<when expression="isEmpty(vars.exceptionResponse)">
+				<ee:transform doc:name="Transform Response Payload"
+					doc:id="5e09edf2-3fe2-4dc3-a3d4-6c709b3f3ee0">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"responseStatus": "SUCCESS",
+	"resultMessages": "insert batchLog Success"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Error occured while inserting"
+					doc:id="8660e260-a13b-4199-a1b1-1bfbaab91b79"
+					message="Error occured while inserting" />
+			</otherwise>
+		</choice>
+		<logger level="INFO" doc:name="End of transaction"
+			doc:id="cb8b6764-5b8f-4791-8d49-bbb15d38d0c3"
+			message="End of transaction for transaction-id #[vars.transactionId]" />
+	</flow>
+</mule>

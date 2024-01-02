@@ -1,0 +1,42 @@
+# API specification
+api:
+  name: "${project.artifactId}"
+  version: "${project.version}"
+  autodiscoveryID: "00000000"
+  
+# Listener configuration
+https:
+  host: "0.0.0.0"
+  port: "8082"
+  
+# API configuration
+mfg-machinedata-prc-api:
+  http-listener:
+    path: "/api/*"
+  http-client:
+    client-id:  "Client Id overridden at deploy time"  
+    client-secret: "Client secret overridden at deploy time"
+pi:
+  scheduler-frequency: "30"  
+
+# OSIPI Machine Data System API configuration
+mfg-osipi-machinedata-sys:
+  host: "mfg-osipi-machinedata-sys-api-v1-dev.ca-c1.cloudhub.io"
+  port: "443"
+  base-path: "/api"
+  ping-path: "/api/ping"
+  points-path: "/points"
+
+# Data Warehouse Machine Data System API configuration
+mfg-dw-machinedata-sys:
+  host: "mfg-dw-machinedata-sys-api-v1-dev.ca-c1.cloudhub.io"
+  port: "443"
+  base-path: "/api"
+  ping-path: "/api/ping"
+  create-data-path: "/machineData"
+
+# Common configuration   
+connection:
+  idle-timeout: "300000"
+  frequency: "5000"
+  attempts: "2"

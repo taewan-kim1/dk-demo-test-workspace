@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_f61b0608_ef1b_4cf7_b29d_3cff7acc1c32_Output_Payload = Array<{|  name: String,   status: String|}>
+
