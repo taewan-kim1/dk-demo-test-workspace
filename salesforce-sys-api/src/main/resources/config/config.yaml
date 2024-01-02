@@ -1,0 +1,6 @@
+# Common properties shared across all environments
+api:
+  name: "${project.artifactId}"
+  version: "${project.version}"
+  autodiscoveryID: "00000000"
+  

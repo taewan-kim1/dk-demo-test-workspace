@@ -1,0 +1,9 @@
+%dw 2.0
+
+type auto_235903ee_799c_45b6_96a0_0b3904c15b86_Input_Payload = {
+  if_nm: String, 
+  if_id: String, 
+  start_dtm: String, 
+  _?: Any
+}
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd">
+	<flow name="custRiskChkRelay" doc:id="235903ee-799c-45b6-96a0-0b3904c15b86" >
+		<logger level="INFO" doc:name="Logger" doc:id="27d4297b-8d34-49a2-99bb-0fd7306bb6ce" message="#[payload]"/>
+		<batch:job jobName="custRiskChkRelay_Batch" doc:id="3966be26-ef28-4f38-826a-f1b2a90130a6" >
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="b024c10d-da10-4e0c-a923-72574c48ff39" />
+			</batch:process-records>
+		</batch:job>
+	</flow>
+</mule>
