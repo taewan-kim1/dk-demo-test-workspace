@@ -15,7 +15,7 @@ output application/java
 payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
-		<http:request method="GET" doc:name="Request" doc:id="e0385333-92c4-48d3-bbf4-f044e118c83f" config-ref="HTTP_Request_configuration" path="/result/send"/>
+		<http:request method="GET" doc:name="Request" doc:id="e0385333-92c4-48d3-bbf4-f044e118c83f" config-ref="HTTP_Request_configuration" path="/result/save"/>
 		<ee:transform doc:name="Transform Message" doc:id="bd1f8f81-356c-4860-827b-78c8619d9c62" >
 			<ee:message >
 				<ee:set-payload ><![CDATA[%dw 2.0

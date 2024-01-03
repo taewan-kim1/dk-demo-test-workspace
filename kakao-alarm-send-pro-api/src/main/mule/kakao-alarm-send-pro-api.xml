@@ -20,9 +20,15 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 			doc:id="a8c80972-6f95-455e-a5ed-d4abf5d2202e">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
-output application/java
+output application/x-www-form-urlencoded
 ---
-payload]]></ee:set-payload>
+{
+    "object_type":"text",
+    "text":"2024년 1월 4일 카톡 테스트!!!",
+    "link":{
+        "web_url":"www.naver.com"
+    }
+}]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="Start of kakao-alarm-process"

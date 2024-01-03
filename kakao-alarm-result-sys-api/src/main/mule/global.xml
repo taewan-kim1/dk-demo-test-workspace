@@ -13,7 +13,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 			port="8081" />
 	</http:listener-config>
 	<http:request-config
-		name="HTTP_Request_configuration"
+		name="HTTP_Request_configuration_result"
 		doc:name="HTTP Request configuration"
 		doc:id="948ef01a-dd59-4626-b830-6f8f39250db9" />
 </mule>
