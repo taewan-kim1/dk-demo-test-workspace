@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="Implementation_kakao-alarm-reult" doc:id="4d2b2326-1b43-4d1b-aaad-0c314514e7e9" >
+		<logger level="INFO" doc:name="Success Input messages" doc:id="b669931d-3fd0-44fa-bc4b-ea4b94d8934e" message="Success Input messages"/>
+		<ee:transform doc:name="Transform Message" doc:id="83009e27-3b07-4bcd-9737-7c04f8f4077f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="GET" doc:name="Request" doc:id="e0385333-92c4-48d3-bbf4-f044e118c83f" config-ref="HTTP_Request_configuration" path="/result/send"/>
+		<ee:transform doc:name="Transform Message" doc:id="bd1f8f81-356c-4860-827b-78c8619d9c62" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Success Output messages" doc:id="0e05c6d6-1a42-452d-a2d9-90ac84e2eb9c" message="Success Output messages"/>
+	</sub-flow>
+</mule>
