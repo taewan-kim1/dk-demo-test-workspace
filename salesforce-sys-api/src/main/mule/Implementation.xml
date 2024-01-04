@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="getCustRisk" doc:id="b75ff4c8-5c64-4fe6-93af-9ff9be80b7b9" >
+		<logger level="INFO" doc:name="Logger" doc:id="e5020b93-dd26-442d-8c93-f3ac16a24fae" message='"오긴함??"'/>
+		<salesforce:query-xml-stream doc:name="Query xml stream" doc:id="9caa1417-9161-4c28-a0e1-c8dec23fa539" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[select cust_id__c, cust_nm__c, pred_ym__c, ma_id__c, ma_nm__c from CustRisk__c]]></salesforce:salesforce-query>
+		</salesforce:query-xml-stream>
+		<ee:transform doc:name="Transform Message" doc:id="7e57f2df-bb5b-471f-abc4-2ccb168a6544" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	cust_id__c: payload01.payload.records.cust_id__c default "",
+	cust_nm__c: payload01.payload.records.cust_nm__c default "",
+	pred_ym__c: payload01.payload.records.ma_id__c default "",
+	ma_id__c: payload01.payload.records.ma_nm__c default "",
+	ma_nm__c: payload01.payload.records.pred_ym__c as String default ""
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="b1b58f05-3d76-44c5-9f83-64aec26a239e" message="#[payload]"/>
+	</flow>
+</mule>

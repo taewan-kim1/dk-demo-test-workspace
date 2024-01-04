@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+    <apikit:config name="batch-pro-api-config" api="resource::b9794970-9656-468b-8588-2282da1fe403:batch-pro-api:1.0.1:raml:zip:batch-pro-api.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+	<configuration-properties doc:name="Configuration properties" doc:id="fc4b657f-b669-4f19-911a-b4c10b4de8f8" file="config/config.yaml" />
+	<http:request-config name="dbServer-sys-httpRequestConfig" doc:name="HTTP Request configuration" doc:id="4d1a25d3-dc5f-473b-8569-0b636117afe7" basePath="/api/dbServerSys/v1" >
+		<http:request-connection host="${req-dbServer-sys-api.host}" port="${req-dbServer-sys-api.port}" connectionIdleTimeout="${connection.idle-timeout}" >
+			<reconnection >
+				<reconnect frequency="${connection.frequency}" count="${connection.attempts}" />
+			</reconnection>
+		</http:request-connection>
+	</http:request-config>
+	<http:request-config name="custRiskChk-pro-httpRequestConfig" doc:name="HTTP Request configuration" doc:id="dbedcfea-f2c6-4223-bc7e-175ff1c3e76a" basePath="/api/custRiskChkPro/v1">
+		<http:request-connection host="${req-custRiskChk-pro-api.host}" port="${req-custRiskChk-pro-api.port}" connectionIdleTimeout="${connection.idle-timeout}" >
+			<reconnection >
+				<reconnect frequency="${connection.frequency}" count="${connection.attempts}" />
+			</reconnection>
+		</http:request-connection>
+	</http:request-config>
+
+</mule>

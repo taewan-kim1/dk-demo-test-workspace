@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="custRiskChkRelay" doc:id="235903ee-799c-45b6-96a0-0b3904c15b86" >
+		<logger level="INFO" doc:name="Logger" doc:id="27d4297b-8d34-49a2-99bb-0fd7306bb6ce" message="#[payload]"/>
+		<http:request method="GET" doc:name="Request" doc:id="dcedb626-d7db-464c-8580-79df4809ed04" config-ref="salseforce_sys_api_Request_configuration" path="/getCustRisk">
+			<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"version" : "v1"
+}]]]></http:uri-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="0c63c675-aea3-4349-81cf-1313134b6b6d" message="#[payload]" />
+	</flow>
+</mule>

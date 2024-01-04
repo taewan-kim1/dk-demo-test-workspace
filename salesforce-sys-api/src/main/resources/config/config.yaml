@@ -1,0 +1,10 @@
+# Common properties shared across all environments
+api:
+  name: "${project.artifactId}"
+  version: "${project.version}"
+  autodiscoveryID: "00000000"
+ 
+salesforce:
+  username: "asxzqwsaerfd@naver.com"
+  password: "Xodhks104!" 
+  token: "6lyFsX0HxNAJbGocLU5yzEBcR"

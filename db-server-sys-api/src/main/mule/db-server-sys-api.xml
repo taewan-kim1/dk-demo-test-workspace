@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
     <flow name="db-server-sys-api-main">
-        <http:listener config-ref="db-server-sys-api-httpListenerConfig" path="/api/*">
+        <http:listener config-ref="HTTP_Listener_config" path="/api/dbServerSys/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
             <http:error-response statusCode="#[vars.httpStatus default 500]">
-                <http:body>#[payload]</http:body>
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
         <apikit:router config-ref="db-server-sys-api-config" />
@@ -93,13 +93,13 @@ output application/json
         </error-handler>
     </flow>
     <flow name="db-server-sys-api-console">
-        <http:listener config-ref="db-server-sys-api-httpListenerConfig" path="/console/*">
+        <http:listener config-ref="HTTP_Listener_config" path="/console/dbServerSys/*">
             <http:response statusCode="#[vars.httpStatus default 200]">
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:response>
             <http:error-response statusCode="#[vars.httpStatus default 500]">
-                <http:body>#[payload]</http:body>
-                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
         <apikit:console config-ref="db-server-sys-api-config" />
@@ -120,9 +120,9 @@ output application/json
         </error-handler>
     </flow>
     <flow name="get:\v1\getSidoSggCd:db-server-sys-api-config">
-        <flow-ref doc:name="Flow Reference" doc:id="5e091948-f829-4712-8b33-aecc78591095" name="getSidoSggCd" />
+		<flow-ref doc:name="Flow Reference" doc:id="1cee9b74-e4fd-47ac-9d77-1c2a4555c0d1" name="getSidoSggCd"/>
     </flow>
     <flow name="post:\v1\batchLog:application\json:db-server-sys-api-config">
-        <flow-ref doc:name="Flow Reference" doc:id="1ff2f3c8-e37b-40a6-a892-5b61b208c64e" name="batchLog" />
+		<flow-ref doc:name="Flow Reference" doc:id="66c89abb-4d29-45b8-8c1f-2cda25c6f964" name="batchLog"/>
     </flow>
 </mule>

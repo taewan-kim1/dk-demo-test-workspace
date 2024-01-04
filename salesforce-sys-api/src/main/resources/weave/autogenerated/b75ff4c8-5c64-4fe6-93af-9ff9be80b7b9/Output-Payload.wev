@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_b75ff4c8_5c64_4fe6_93af_9ff9be80b7b9_Output_Payload = Array<{|  cust_id__c: String,   cust_nm__c: String,   pred_ym__c: String,   ma_id__c: String,   ma_nm__c: String|}>
+

@@ -7,7 +7,7 @@
 	<version>1.0.2</version>
 	<packaging>mule-application</packaging>
 
-	<name>foodsafety-pro-api</name>
+	<name>foodsafety_pro_api</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
