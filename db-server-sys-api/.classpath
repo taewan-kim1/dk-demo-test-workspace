@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="con" path="MULE_LIB/org.mule.connectors/mule-sockets-connector/1.2.4"/>
+	<classpathentry kind="con" path="MULE_LIB/org.mule.connectors/mule-http-connector/1.9.0"/>
 	<classpathentry kind="con" path="org.mule.tooling.MULE_PROJECT_LIB"/>
 	<classpathentry kind="con" path="MULE_LIB/org.mule.connectors/mule-db-connector/1.14.6"/>
 	<classpathentry kind="con" path="org.mule.tooling.API_SPEC_LIB/b9794970-9656-468b-8588-2282da1fe403/dkbmc-global-resources/1.0.5"/>
 	<classpathentry kind="con" path="org.mule.tooling.API_SPEC_LIB/b9794970-9656-468b-8588-2282da1fe403/db-server-sys-api/1.0.3"/>
 	<classpathentry kind="con" path="MULE_LIB/org.mule.modules/mule-apikit-module/1.9.2"/>
-	<classpathentry kind="con" path="MULE_LIB/org.mule.connectors/mule-sockets-connector/1.2.3"/>
-	<classpathentry kind="con" path="MULE_LIB/org.mule.connectors/mule-http-connector/1.8.0"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="MULE_RUNTIME/org.mule.tooling.server.4.5.ee"/>
 	<classpathentry kind="src" path="src/main/mule"/>
@@ -15,5 +15,6 @@
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/resources"/>
 	<classpathentry kind="src" path="src/test/munit"/>
+	<classpathentry kind="src" path="/mule-doamin"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

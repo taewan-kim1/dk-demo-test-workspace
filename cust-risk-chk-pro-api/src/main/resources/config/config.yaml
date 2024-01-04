@@ -1,0 +1,17 @@
+# API specification
+api:
+  name: "${project.artifactId}"
+  version: "${project.version}"
+  autodiscoveryID: "00000000"
+  
+# Common configuration   
+connection:
+  idle-timeout: "300000"
+  frequency: "5000"
+  attempts: "2"
+
+# call salesforce sys API
+req-salseforce-sys-api:
+  host: "localhost"
+  port: "8081"
+  base-patch: "/test1/${project.version}"
