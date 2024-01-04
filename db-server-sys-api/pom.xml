@@ -13,14 +13,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-<<<<<<< HEAD
-		<app.runtime>4.4.0-20230320</app.runtime>
-		<mule.maven.plugin.version>4.0.0</mule.maven.plugin.version>
-=======
+
 		<app.runtime>4.5.1</app.runtime>
 		<mule.maven.plugin.version>4.0.0</mule.maven.plugin.version>
 		<mariadb-java-client.version>3.0.7</mariadb-java-client.version>
->>>>>>> 5c3858c84e1247f7a1e32cce50bc6f1985b5cc79
 	</properties>
 
 	<build>
