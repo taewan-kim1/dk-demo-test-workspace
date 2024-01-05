@@ -1,0 +1,12 @@
+{
+	dataType: "json",
+	startIdx: 1,
+	endIdx: 5,
+	CHNG_DT: "",
+	PRDLST_REPORT_NO: "",
+	BSSH_NM: "",
+	PRDLST_NM: "",
+	LCNS_NO: "",
+	PRMS_DT: "",
+	PRDLST_DCNM: ""
+}

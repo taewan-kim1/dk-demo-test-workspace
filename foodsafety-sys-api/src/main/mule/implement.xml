@@ -9,14 +9,13 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		<ee:transform doc:name="Save headers to variable" doc:id="1847a1f8-772a-4280-9d6a-f4ef2d2a6f47" >
 			<ee:message />
 			<ee:variables >
-				<ee:set-variable variableName="headers" ><![CDATA[%dw 2.0
+				<ee:set-variable variableName="ifData" ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-	if_id: attributes.headers.if_id,
-	if_nm: attributes.headers.if_nm,
-	start_dtm: attributes.headers.start_dtm,
-	end_dtm: now() >> 'Asia/Seoul'
+	if_id: payload.if_id,
+	if_nm: payload.if_nm,
+	start_dtm: payload.start_dtm
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
@@ -24,22 +23,6 @@ output application/json
 		<until-successful maxRetries="3" doc:name="Until Successful - Retry Max " doc:id="9d115bcc-4a43-4cf1-8bee-e1b2b9fbb251" millisBetweenRetries="10000" >
 			<http:request method="GET" doc:name="Request to Foodsafety.org" doc:id="f8da3c01-945d-4724-adf5-07fc21c05e44" url="#[payload.final]" sendBodyMode="AUTO" />
 		</until-successful>
-		<ee:transform doc:name="Transform Message" doc:id="37ab6941-2308-4cd7-ae83-ad5444bf3cdb" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-{
-	if_data: {
-		end_dtm: vars.headers.end_dtm as String,
-		if_nm: vars.headers.if_nm,
-		if_id: vars.headers.if_id,
-		start_dtm: vars.headers.start_dtm
-	},
-	I1250: payload.I1250
-}]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
 		<logger level="INFO" doc:name="Logging payload" doc:id="72723f4a-dac2-436b-a3e6-c40a2c7fea6e" message="#[payload]" />
 	</flow>
 	<sub-flow name="BuildingURL" doc:id="e125d7dd-47fa-410b-bf72-7e8a0834daa0" >
@@ -51,14 +34,20 @@ import * from dw::core::URL
 output application/java
 ---
 {
-	fullUrl: encodeURI(p('url.host') ++ p('secure::encrypted.keyId') ++ "/" ++ p('url.serviceId') ++ "/" ++ p('url.dataType') ++ "/" ++ p('url.startIdx') ++ "/" ++ p('url.endIdx') ++ "/" ++
-	(if(isEmpty(p('url.CHNG_DT'))) "" else "CHNG_DT=" ++ p('url.CHNG_DT') ++ "&") ++
-	(if(isEmpty(p('url.PRDLST_REPORT_NO'))) "" else "PRDLST_REPORT_NO=" ++ p('url.PRDLST_REPORT_NO') ++ "&") ++
-	(if(isEmpty(p('url.BSSH_NM'))) "" else "BSSH_NM=" ++ p('url.BSSH_NM') ++ "&") ++
-	(if(isEmpty(p('url.PRDLST_NM'))) "" else "PRDLST_NM=" ++ p('url.PRDLST_NM') ++ "&") ++
-	(if(isEmpty(p('url.LCNS_NO'))) "" else "LCNS_NO=" ++ p('url.LCNS_NO') ++ "&") ++
-	(if(isEmpty(p('url.PRMS_DT'))) "" else "PRMS_DT=" ++ p('url.PRMS_DT') ++ "&") ++
-	(if(isEmpty(p('url.PRDLST_DCNM'))) "" else "PRDLST_DCNM=" ++ p('url.PRDLST_DCNM') ++ "&"))
+	fullUrl: encodeURI(
+		p('url.host') ++ 
+		p('secure::encrypted.keyId') ++ "/" ++ 
+		p('url.serviceId') ++ "/" ++ 
+		payload.dataType as String default p('url.dataType') ++ "/" ++ 
+		payload.startIdx as String default p('url.startIdx') ++ "/" ++ 
+		payload.endIdx as String default p('url.endIdx') ++ "/" ++
+		(if(isEmpty(payload.CHNG_DT)) (if(isEmpty(p('url.CHNG_DT'))) "" else ("CHNG_DT=" ++ p('url.CHNG_DT') ++ "&")) else ("CHNG_DT=" ++ payload.CHNG_DT as String ++ "&")) ++
+		(if(isEmpty(payload.PRDLST_REPORT_NO)) (if(isEmpty(p('url.PRDLST_REPORT_NO'))) "" else "PRDLST_REPORT_NO=" ++ p('url.PRDLST_REPORT_NO') ++ "&") else ("PRDLST_REPORT_NO=" ++ payload.PRDLST_REPORT_NO as String ++ "&")) ++
+		(if(isEmpty(payload.BSSH_NM)) (if(isEmpty(p('url.BSSH_NM'))) "" else ("BSSH_NM=" ++ p('url.BSSH_NM') ++ "&")) else ("BSSH_NM=" ++ payload.BSSH_NM as String ++ "&")) ++
+		(if(isEmpty(payload.PRDLST_NM)) (if(isEmpty(p('url.PRDLST_NM'))) "" else ("PRDLST_NM=" ++ p('url.PRDLST_NM') ++ "&")) else ("PRDLST_NM=" ++ payload.PRDLST_NM as String ++ "&")) ++
+		(if(isEmpty(payload.LCNS_NO)) (if(isEmpty(p('url.LCNS_NO'))) "" else ("LCNS_NO=" ++ p('url.LCNS_NO') ++ "&")) else ("LCNS_NO=" ++ payload.LCNS_NO as String ++ "&")) ++
+		(if(isEmpty(payload.PRMS_DT)) (if(isEmpty(p('url.PRMS_DT'))) "" else ("PRMS_DT=" ++ p('url.PRMS_DT') ++ "&")) else ("PRMS_DT=" ++ payload.PRMS_DT as String ++ "&")) ++
+		(if(isEmpty(payload.PRDLST_DCNM)) (if(isEmpty(p('url.PRDLST_DCNM'))) "" else ("PRDLST_DCNM=" ++ p('url.PRDLST_DCNM') ++ "&")) else ("PRDLST_DCNM=" ++ payload.PRDLST_DCNM as String ++ "&")))
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
@@ -73,5 +62,6 @@ output application/java
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="bd926c66-17ce-49fc-a9e2-ab8f406d8f89" message="#[payload]"/>
 	</sub-flow>
 </mule>

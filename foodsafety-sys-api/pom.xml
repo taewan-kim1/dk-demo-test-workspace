@@ -4,7 +4,7 @@
 
 	<groupId>b9794970-9656-468b-8588-2282da1fe403</groupId>
 	<artifactId>foodsafety-sys-api</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<packaging>mule-application</packaging>
 
 	<name>foodsafety-sys-api</name>
@@ -30,7 +30,7 @@
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
-					<classifier>mule-application</classifier>
+					<classifier>---- select project type ----</classifier>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -38,11 +38,11 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>b9794970-9656-468b-8588-2282da1fe403</groupId>
-			<artifactId>foodsafety_sys_api</artifactId>
-			<version>1.1.3</version>
-			<classifier>raml</classifier>
-			<type>zip</type>
+			<groupId>com.mycompany</groupId>
+			<artifactId>mule-doamin</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<classifier>mule-domain</classifier>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.modules</groupId>
@@ -57,11 +57,11 @@
 			<classifier>mule-plugin</classifier>
 		</dependency>
 		<dependency>
-			<groupId>com.mycompany</groupId>
-			<artifactId>mule-doamin</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-			<classifier>mule-domain</classifier>
-			<scope>provided</scope>
+			<groupId>b9794970-9656-468b-8588-2282da1fe403</groupId>
+			<artifactId>foodsafety_sys_api</artifactId>
+			<version>1.1.4</version>
+			<classifier>raml</classifier>
+			<type>zip</type>
 		</dependency>
 	</dependencies>
 

@@ -123,6 +123,24 @@ type auto_18e8f78c_60d9_4f3a_a0b9_91d7465fec7d_Output_Variables_headers = Any
 
 ]]></types:shape>
     </types:type>
+    <types:type name="payloadEx" format="json">
+      <types:shape format="weave" example="examples/payload.json"><![CDATA[%dw 2.0
+
+type payloadEx = {|
+  dataType: String, 
+  startIdx: Number {"typeId": "int"}, 
+  endIdx: Number {"typeId": "int"}, 
+  CHNG_DT: String, 
+  PRDLST_REPORT_NO: String, 
+  BSSH_NM: String, 
+  PRDLST_NM: String, 
+  LCNS_NO: String, 
+  PRMS_DT: String, 
+  PRDLST_DCNM: String
+|} {"example": "{\\\"dataType\\\":\\\"json\\\",\\\"startIdx\\\":1,\\\"endIdx\\\":5,\\\"CHNG_DT\\\":\\\"\\\",\\\"PRDLST_REPORT_NO\\\":\\\"\\\",\\\"BSSH_NM\\\":\\\"\\\",\\\"PRDLST_NM\\\":\\\"\\\",\\\"LCNS_NO\\\":\\\"\\\",\\\"PRMS_DT\\\":\\\"\\\",\\\"PRDLST_DCNM\\\":\\\"\\\"}"}
+
+]]></types:shape>
+    </types:type>
   </types:catalog>
   <types:enrichment select="#18e8f78c-60d9-4f3a-a0b9-91d7465fec7d">
     <types:processor-declaration>
@@ -147,6 +165,15 @@ type auto_18e8f78c_60d9_4f3a_a0b9_91d7465fec7d_Output_Variables_headers = Any
           <types:variable name="url" type="auto_18e8f78c-60d9-4f3a-a0b9-91d7465fec7d_Output-Variables-url"/>
         </types:variables>
       </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#cfda7c1b-9711-4c68-a97e-65bb5eb3365f">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="payloadEx"/>
+        </types:message>
+      </types:input-event>
     </types:processor-declaration>
   </types:enrichment>
 </types:mule>

@@ -7,8 +7,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
 	<flow name="foodsafety_sys_api-main">
-		<http:listener
-			config-ref="foodsafety_sys_api-httpListenerConfig" path="/api/fssys/*">
+		<http:listener config-ref="HTTP_Listener_config"
+			path="/api/fssys/*">
 			<http:response
 				statusCode="#[vars.httpStatus default 200]">
 				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
@@ -111,15 +111,15 @@ output application/json
 	</flow>
 	<flow name="foodsafety_sys_api-console">
 		<http:listener
-			config-ref="foodsafety_sys_api-httpListenerConfig" path="/console/*">
+			config-ref="HTTP_Listener_config" path="/console/fssys/*">
 			<http:response
 				statusCode="#[vars.httpStatus default 200]">
-				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
 			</http:response>
 			<http:error-response
 				statusCode="#[vars.httpStatus default 500]">
-				<http:body>#[payload]</http:body>
-				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+				<http:body><![CDATA[#[payload]]]></http:body>
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
 			</http:error-response>
 		</http:listener>
 		<apikit:console config-ref="foodsafety_sys_api-config" />
@@ -144,116 +144,41 @@ output application/json
 		<logger level="INFO"
 			message="get:\ping:foodsafety_sys_api-config" />
 	</flow>
-	<flow name="get:\v1\getfs:foodsafety_sys_api-config">
-		<flow-ref doc:name="Flow Reference" doc:id="f865ff99-bf30-410b-a7db-147576386928" name="RequestFoodSafety"/>
-		<!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message">
-			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
-output application/json
-&#45;&#45;-
-{
-  if_data: {
-    if_id: "DK_IF_E1002_FS001_MD001",
-    if_nm: "Foodsafety",
-    start_dtm: "2023-12-19T13:12:49.274Z",
-    end_dtm: "2023-12-19T13:16:42.274Z"
-  },
-  I1250: {
-    total_count: "5",
-    row: [
-      {
-        PRDLST_REPORT_NO: "19550509001404",
-        PRMS_DT: "20170911",
-        LAST_UPDT_DTM: "20180628",
-        LCNS_NO: "19550509001",
-        PRDLST_NM: "MAEIL KOREAN HOT SAUCE",
-        QLITY_MNTNC_TMLMT_DAYCNT: "",
-        BSSH_NM: "매일식품주식회사",
-        PRDLST_DCNM: "소스",
-        CHILD_CRTFC_YN: "",
-        INDUTY_CD_NM: "식품제조가공업",
-        USAGE: "식품 조리 시 기호에 맞게 적당량을 첨가하거나 직접섭취",
-        POG_DAYCNT: "제조일로부터 24개월까지",
-        HIENG_LNTRT_DVS_NM: "해당없음",
-        PRODUCTION: "아니오",
-        PRPOS: ""
-      }, 
-      {
-        PRDLST_REPORT_NO: "19550509001633",
-        PRMS_DT: "20230921",
-        LAST_UPDT_DTM: "20230927",
-        LCNS_NO: "19550509001",
-        PRDLST_NM: "매일한식간장",
-        QLITY_MNTNC_TMLMT_DAYCNT: "",
-        BSSH_NM: "매일식품주식회사",
-        PRDLST_DCNM: "한식간장",
-        CHILD_CRTFC_YN: "",
-        INDUTY_CD_NM: "식품제조가공업",
-        USAGE: "식품 조리 시 적당량을 첨가하거나 직접섭취",
-        POG_DAYCNT: "제조일로부터 24개월",
-        HIENG_LNTRT_DVS_NM: "해당없음",
-        PRODUCTION: "아니오",
-        PRPOS: ""
-      }, 
-      {
-        PRDLST_REPORT_NO: "19550509001429",
-        PRMS_DT: "20180125",
-        LAST_UPDT_DTM: "20200307",
-        LCNS_NO: "19550509001",
-        PRDLST_NM: "간장분말",
-        QLITY_MNTNC_TMLMT_DAYCNT: "",
-        BSSH_NM: "매일식품주식회사",
-        PRDLST_DCNM: "복합조미식품",
-        CHILD_CRTFC_YN: "",
-        INDUTY_CD_NM: "식품제조가공업",
-        USAGE: "직접 섭취 또는 스프, 소스류, 복합조미료, 장류등의 제조시 첨가하여 사용",
-        POG_DAYCNT: "제조일로부터 12개월까지",
-        HIENG_LNTRT_DVS_NM: "해당없음",
-        PRODUCTION: "아니오",
-        PRPOS: ""
-      }, 
-      {
-        PRDLST_REPORT_NO: "19550509001398",
-        PRMS_DT: "20170818",
-        LAST_UPDT_DTM: "20181212",
-        LCNS_NO: "19550509001",
-        PRDLST_NM: "매일맛있는밥상 야채용맛간장소스",
-        QLITY_MNTNC_TMLMT_DAYCNT: "",
-        BSSH_NM: "매일식품주식회사",
-        PRDLST_DCNM: "소스",
-        CHILD_CRTFC_YN: "",
-        INDUTY_CD_NM: "식품제조가공업",
-        USAGE: "식품 조리 시 기호에 맞게 적당량을 첨가하거나 직접섭취",
-        POG_DAYCNT: "24개월",
-        HIENG_LNTRT_DVS_NM: "해당없음",
-        PRODUCTION: "아니오",
-        PRPOS: ""
-      }, 
-      {
-        PRDLST_REPORT_NO: "19550509001597",
-        PRMS_DT: "20221220",
-        LAST_UPDT_DTM: "20230825",
-        LCNS_NO: "19550509001",
-        PRDLST_NM: "매일양조간장15S",
-        QLITY_MNTNC_TMLMT_DAYCNT: "",
-        BSSH_NM: "매일식품주식회사",
-        PRDLST_DCNM: "양조간장",
-        CHILD_CRTFC_YN: "",
-        INDUTY_CD_NM: "식품제조가공업",
-        USAGE: "식품 조리 시 적당량을 첨가하여 섭취",
-        POG_DAYCNT: "제조일로부터 24개월",
-        HIENG_LNTRT_DVS_NM: "해당없음",
-        PRODUCTION: "아니오",
-        PRPOS: ""
-      }
-    &#93;,
-    RESULT: {
-      MSG: "정상처리되었습니다.",
-      CODE: "INFO-000"
-    }
-  }
-} as Object {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload>
-			</ee:message>
-		</ee:transform> [STUDIO] -->
+	<flow
+		name="put:\v1\getfs:application\json:foodsafety_sys_api-config">
+		<flow-ref doc:name="Flow Reference"
+			doc:id="f865ff99-bf30-410b-a7db-147576386928"
+			name="RequestFoodSafety" />
+		<!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message"> 
+			<ee:message> <ee:set-payload><![CDATA[%dw 2.0 output application/json &#45;&#45;- 
+			{ if_data: { if_id: "DK_IF_E1002_FS001_MD001", if_nm: "Foodsafety", start_dtm: 
+			"2023-12-19T13:12:49.274Z", end_dtm: "2023-12-19T13:16:42.274Z" }, I1250: 
+			{ total_count: "5", row: [ { PRDLST_REPORT_NO: "19550509001404", PRMS_DT: 
+			"20170911", LAST_UPDT_DTM: "20180628", LCNS_NO: "19550509001", PRDLST_NM: 
+			"MAEIL KOREAN HOT SAUCE", QLITY_MNTNC_TMLMT_DAYCNT: "", BSSH_NM: "매일식품주식회사", 
+			PRDLST_DCNM: "소스", CHILD_CRTFC_YN: "", INDUTY_CD_NM: "식품제조가공업", USAGE: "식품 
+			조리 시 기호에 맞게 적당량을 첨가하거나 직접섭취", POG_DAYCNT: "제조일로부터 24개월까지", HIENG_LNTRT_DVS_NM: 
+			"해당없음", PRODUCTION: "아니오", PRPOS: "" }, { PRDLST_REPORT_NO: "19550509001633", 
+			PRMS_DT: "20230921", LAST_UPDT_DTM: "20230927", LCNS_NO: "19550509001", PRDLST_NM: 
+			"매일한식간장", QLITY_MNTNC_TMLMT_DAYCNT: "", BSSH_NM: "매일식품주식회사", PRDLST_DCNM: 
+			"한식간장", CHILD_CRTFC_YN: "", INDUTY_CD_NM: "식품제조가공업", USAGE: "식품 조리 시 적당량을 
+			첨가하거나 직접섭취", POG_DAYCNT: "제조일로부터 24개월", HIENG_LNTRT_DVS_NM: "해당없음", PRODUCTION: 
+			"아니오", PRPOS: "" }, { PRDLST_REPORT_NO: "19550509001429", PRMS_DT: "20180125", 
+			LAST_UPDT_DTM: "20200307", LCNS_NO: "19550509001", PRDLST_NM: "간장분말", QLITY_MNTNC_TMLMT_DAYCNT: 
+			"", BSSH_NM: "매일식품주식회사", PRDLST_DCNM: "복합조미식품", CHILD_CRTFC_YN: "", INDUTY_CD_NM: 
+			"식품제조가공업", USAGE: "직접 섭취 또는 스프, 소스류, 복합조미료, 장류등의 제조시 첨가하여 사용", POG_DAYCNT: 
+			"제조일로부터 12개월까지", HIENG_LNTRT_DVS_NM: "해당없음", PRODUCTION: "아니오", PRPOS: "" 
+			}, { PRDLST_REPORT_NO: "19550509001398", PRMS_DT: "20170818", LAST_UPDT_DTM: 
+			"20181212", LCNS_NO: "19550509001", PRDLST_NM: "매일맛있는밥상 야채용맛간장소스", QLITY_MNTNC_TMLMT_DAYCNT: 
+			"", BSSH_NM: "매일식품주식회사", PRDLST_DCNM: "소스", CHILD_CRTFC_YN: "", INDUTY_CD_NM: 
+			"식품제조가공업", USAGE: "식품 조리 시 기호에 맞게 적당량을 첨가하거나 직접섭취", POG_DAYCNT: "24개월", HIENG_LNTRT_DVS_NM: 
+			"해당없음", PRODUCTION: "아니오", PRPOS: "" }, { PRDLST_REPORT_NO: "19550509001597", 
+			PRMS_DT: "20221220", LAST_UPDT_DTM: "20230825", LCNS_NO: "19550509001", PRDLST_NM: 
+			"매일양조간장15S", QLITY_MNTNC_TMLMT_DAYCNT: "", BSSH_NM: "매일식품주식회사", PRDLST_DCNM: 
+			"양조간장", CHILD_CRTFC_YN: "", INDUTY_CD_NM: "식품제조가공업", USAGE: "식품 조리 시 적당량을 
+			첨가하여 섭취", POG_DAYCNT: "제조일로부터 24개월", HIENG_LNTRT_DVS_NM: "해당없음", PRODUCTION: 
+			"아니오", PRPOS: "" } &#93;, RESULT: { MSG: "정상처리되었습니다.", CODE: "INFO-000" } 
+			} } as Object {encoding: "UTF-8", mediaType: "application/json"}&#93;&#93;></ee:set-payload> 
+			</ee:message> </ee:transform> [STUDIO] -->
 	</flow>
 </mule>
