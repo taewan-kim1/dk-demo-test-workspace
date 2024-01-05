@@ -20,29 +20,43 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd
 http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd">
 	<flow name="implementFlow" doc:id="ee853b97-77c5-4e1c-b60d-2e184f6d709e" >
-		<ee:transform doc:name="INPUT 헤더 정보를 변수에 저장" doc:id="7c123393-4abc-4406-8481-6b700202b174">
+		<ee:transform doc:name="Query Parameter  정보를 변수에 저장" doc:id="7c123393-4abc-4406-8481-6b700202b174">
 			<ee:message />
 			<ee:variables>
-				<ee:set-variable variableName="headers"><![CDATA[%dw 2.0
+				<ee:set-variable variableName="ifData" ><![CDATA[%dw 2.0
 output application/json
 ---
 {
-	if_id: attributes.headers.if_id,
-	if_nm: attributes.headers.if_nm,
-	start_dtm: attributes.headers.start_dtm,
-	end_dtm: now() >> "Asia/Seoul"
+	if_id: attributes.queryParams.if_id,
+	if_nm: attributes.queryParams.if_nm,
+	start_dtm: attributes.queryParams.start_dtm
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="0414da0a-b6b6-4acb-83ca-2fcde10ee114" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="toSys" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	dataType: attributes.queryParams.dataType default "json",
+	startIdx: attributes.queryParams.startIdx default "1",
+	endIdx: attributes.queryParams.endIdx default "10",
+	CHNG_DT: attributes.queryParams.CHNG_DT default "",
+	PRDLST_REPORT_NO: attributes.queryParams.PRDLST_REPORT_NO default "",
+	BSSH_NM: attributes.queryParams.BSSH_NM default "",
+	PRDLST_NM: attributes.queryParams.PRDLST_NM default "전용유",
+	LCNS_NO: attributes.queryParams.LCNS_NO default "",
+	PRMS_DT: attributes.queryParams.PRMS_DT default "",
+	PRDLST_DCNM: attributes.queryParams.PRDLST_DCNM default ""
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<until-successful maxRetries="3" doc:name="10초 간격 3번까지 재시도 (Until Successful)" doc:id="6344dd31-89f5-49c6-a434-39f816c636c8" millisBetweenRetries="10000">
-			<http:request method="GET" doc:name="SYS API에게 OPEN API 데이터 요청" doc:id="1f7f7807-9830-49da-b633-a37e63c9b3dd" url="${sys.url}">
-			<http:headers><![CDATA[#[output application/java
----
-{
-	"start_dtm" : vars.headers.start_dtm,
-	"if_nm" : vars.headers.if_nm,
-	"if_id" : vars.headers.if_id
-}]]]></http:headers>
+			<http:request method="PUT" doc:name="SYS API에게 OPEN API 데이터 요청" doc:id="1f7f7807-9830-49da-b633-a37e63c9b3dd" url="${sys.url}">
+				<http:body ><![CDATA[#[vars.toSys]]]></http:body>
 		</http:request>
 		</until-successful>
 		<logger level="INFO" doc:name="데이터 로깅" doc:id="e83b7702-ebc6-46ed-8965-3212f527013d" message="#[payload]"/>
@@ -89,16 +103,14 @@ payload.'I1250'.'row' map {
 						<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
 ---
+
 {
-  "if_data": {
-    "if_id": payload.if_data.if_id,
-    "if_nm": payload.if_data.if_nm,
-    "start_dtm": payload.if_data.start_dtm,
-    "end_dtm": payload.if_data.end_dtm
-  },
-  "if_method": if(payload.I1250.RESULT.MSG == "정상처리되었습니다.")  "SUCCESS" else "FAILED",
-  "req_body": "요청내용",
-  "res_body": "완료내용"
+	"if_id": vars.ifData.if_id,
+	"if_nm": vars.ifData.if_nm,
+	"start_dtm": vars.ifData.start_dtm,
+	"end_dtm": vars.dbVars.end_dtm,
+	"responseStatus": "SUCCESS",
+	"resultMessage": ""
 }]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
@@ -118,10 +130,10 @@ output application/json
 ---
 {
   "trs_id": correlationId,
-  "if_id": payload.if_data.if_id,
-  "if_nm": payload.if_data.if_nm,
-  "start_dtm": payload.if_data.start_dtm,
-  "end_dtm": payload.if_data.end_dtm,
+  "if_id": vars.ifData.if_id,
+  "if_nm": vars.ifData.if_nm,
+  "start_dtm": vars.ifData.start_dtm,
+  "end_dtm": vars.ifData.end_dtm default now() >> "Asia/Seoul",
   "responseStatus": if(payload.I1250.RESULT.MSG == "정상처리되었습니다.")  "SUCCESS" else "FAILED",
   "message": if(payload.I1250.RESULT.CODE == "INFO-000") "Batch End" else "Batch Failed at " ++ payload.if_data.if_nm
 }]]></ee:set-variable>

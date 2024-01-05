@@ -8,7 +8,8 @@
 	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
 	<flow name="foodsafety_pro_api-main">
 		<http:listener
-			config-ref="HTTP_Listener_config" path="/api/fspro/*">
+			config-ref="HTTP_Listener_config"
+			path="/api/fspro/*">
 			<http:response
 				statusCode="#[vars.httpStatus default 200]">
 				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
@@ -110,16 +111,15 @@ output application/json
 		</error-handler>
 	</flow>
 	<flow name="foodsafety_pro_api-console">
-		<http:listener
-			config-ref="foodsafety_pro_api-httpListenerConfig" path="/console/*">
+		<http:listener config-ref="HTTP_Listener_config" path="/console/fspro/*">
 			<http:response
 				statusCode="#[vars.httpStatus default 200]">
-				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
 			</http:response>
 			<http:error-response
 				statusCode="#[vars.httpStatus default 500]">
-				<http:body>#[payload]</http:body>
-				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+				<http:body><![CDATA[#[payload]]]></http:body>
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
 			</http:error-response>
 		</http:listener>
 		<apikit:console config-ref="foodsafety_pro_api-config" />
@@ -142,7 +142,8 @@ output application/json
 	</flow>
 	<flow
 		name="get:\v1\DK_IF_E1002_FS001_MD001:foodsafety_pro_api-config">
-		<flow-ref doc:name="Flow Reference" doc:id="e75b49bb-b92f-4d79-b7f3-76c14c122120" name="implementFlow"/>
+		<flow-ref doc:name="Flow Reference"
+			doc:id="e75b49bb-b92f-4d79-b7f3-76c14c122120" name="implementFlow" />
 		<!-- [STUDIO:"Transform Message"]<ee:transform doc:name="Transform Message"> 
 			<ee:message> <ee:set-payload><![CDATA[%dw 2.0 output application/json &#45;&#45;- 
 			{ if_data: { if_id: "asd", if_nm: "bad", start_dtm: "2023-12-19T13:12:49.274Z", 
