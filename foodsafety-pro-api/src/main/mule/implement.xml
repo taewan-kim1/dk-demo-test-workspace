@@ -55,11 +55,11 @@ output application/json
 			</ee:variables>
 		</ee:transform>
 		<until-successful maxRetries="3" doc:name="10초 간격 3번까지 재시도 (Until Successful)" doc:id="6344dd31-89f5-49c6-a434-39f816c636c8" millisBetweenRetries="10000">
-			<http:request method="PUT" doc:name="SYS API에게 OPEN API 데이터 요청" doc:id="1f7f7807-9830-49da-b633-a37e63c9b3dd" url="${sys.url}">
+			<http:request method="PUT" doc:name="SYS API에게 OPEN API 데이터 요청" doc:id="1f7f7807-9830-49da-b633-a37e63c9b3dd" url="http://localhost:8081/api/fssys/v1/getfs">
 				<http:body ><![CDATA[#[vars.toSys]]]></http:body>
 		</http:request>
 		</until-successful>
-		<logger level="INFO" doc:name="데이터 로깅" doc:id="e83b7702-ebc6-46ed-8965-3212f527013d" message="#[payload]"/>
+		<!-- [STUDIO:"데이터 로깅"]<logger level="INFO" doc:name="데이터 로깅" doc:id="e83b7702-ebc6-46ed-8965-3212f527013d" message="#[payload&#93;"/> [STUDIO] -->
 		<choice doc:name="데이터 수신 성공 여부" doc:id="1745e027-69bb-4d62-a165-5276cff94301" >
 			<when expression='#[payload.I1250.RESULT.CODE == "INFO-000"]'>
 				<ee:transform doc:name="Salesforce 커스텀 오브젝트 필드명의 csv 형식으로 Transform" doc:id="48b6c503-2fd4-4b54-94a0-46ecf0010f69" >
@@ -67,7 +67,7 @@ output application/json
 					</ee:message>
 					<ee:variables >
 						<ee:set-variable variableName="sfIn" ><![CDATA[%dw 2.0
-output application/csv quoteValues=true
+output application/csv  separator="|", encoding="UTF-8", quoteValues=true, escape='\"'
 ---
 payload.'I1250'.'row' map {
 	Name: $.PRDLST_NM,
@@ -90,7 +90,8 @@ payload.'I1250'.'row' map {
 ]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<salesforce:create-job-bulk-api-v2 objectType="Food_system__c" doc:name="SFDC에 데이터 저장" doc:id="710c3c6e-eaf8-41e1-87c8-05424476c557" config-ref="Salesforce_Config" operation="upsert" externalIdFieldName='PRDLST_REPORT_NO__c' lineEnding="CRLF" target="sfResult">
+				<logger level="INFO" doc:name="Logger" doc:id="93ecdb64-c00a-417f-9db1-03b77a611843" message="#[vars.sfIn]"/>
+				<salesforce:create-job-bulk-api-v2 objectType="Food_system__c" doc:name="SFDC에 데이터 저장" doc:id="710c3c6e-eaf8-41e1-87c8-05424476c557" config-ref="Salesforce_Config" operation="upsert" externalIdFieldName='PRDLST_REPORT_NO__c' target="sfResult" columnDelimiter="PIPE" lineEnding="CRLF">
 					<salesforce:s-objects><![CDATA[#[vars.sfIn]]]></salesforce:s-objects>
 				</salesforce:create-job-bulk-api-v2>
 				<anypoint-mq:publish doc:name="SFDC Bulk Job ID를 MQ에 게시" doc:id="3fe2b6b3-f053-4e8f-986f-ce87bc00324b" destination="salesforce-Bulk-Id-Exchange" config-ref="Anypoint_MQ_Config" target="publishId">

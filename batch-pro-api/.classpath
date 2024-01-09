@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry kind="con" path="org.mule.tooling.API_SPEC_LIB/b9794970-9656-468b-8588-2282da1fe403/batch-pro-api/1.0.1"/>
 	<classpathentry kind="con" path="MULE_LIB/org.mule.connectors/mule-sockets-connector/1.2.4"/>
 	<classpathentry kind="con" path="MULE_LIB/org.mule.connectors/mule-http-connector/1.9.0"/>
-	<classpathentry kind="con" path="org.mule.tooling.API_SPEC_LIB/b9794970-9656-468b-8588-2282da1fe403/batch-pro-api/1.0.1"/>
-	<classpathentry kind="con" path="org.mule.tooling.API_SPEC_LIB/b9794970-9656-468b-8588-2282da1fe403/dkbmc-global-resources/1.0.6"/>
 	<classpathentry kind="con" path="MULE_LIB/org.mule.modules/mule-apikit-module/1.9.2"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="MULE_RUNTIME/org.mule.tooling.server.4.5.ee"/>
