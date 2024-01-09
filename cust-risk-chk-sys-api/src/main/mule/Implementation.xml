@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:s3="http://www.mulesoft.org/schema/mule/s3"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<flow name="upCSVFile" doc:id="773c6e13-d8cf-408a-9c24-5737b4469ce4" >
+		<logger level="INFO" doc:name="Logger" doc:id="0f30d2ea-4894-4c1f-b748-cafc0ba90391" message="#[payload]"/>
+		<set-variable value='#[now() as String{format: "yyyyMMddHHMMss"} ++ ".csv"]' doc:name="Set Variable" doc:id="2e20c288-80e2-47d2-b49c-ef2adafd3864" variableName="filename"/>
+		<ee:transform doc:name="Transform Message" doc:id="31d58404-d3aa-4a98-80cb-a26fbc9f32bd" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/csv
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<try doc:name="Try" doc:id="ffc83dc4-e785-4d86-ab05-73d2f1a35e0f" >
+			<s3:put-object doc:name="Put Object" doc:id="184c4152-7af2-44ca-a7df-3b92d339a490" config-ref="Amazon_S3_Configuration" bucketName="${amazon.s3.bucketNm}" key='#[output application/java&#10;---&#10;"upload/" ++ vars.filename]' contentLength="#[attributes.size]" contentLanguage="ko" contentEncoding="UTF-8"/>
+		</try>
+		<ee:transform doc:name="Transform Message" doc:id="22c6142c-f3f9-42a4-b82c-d230fe562961" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	filename: vars.filename,
+	responseStatus: "SUCCESS",
+	resultMessages: ""
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="dec2dd15-295b-4c62-94e2-87e8a5a86389" message="end save CSV FILE ++"/>
+	</flow>
+</mule>

@@ -7,14 +7,34 @@ http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/ba
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
 	<flow name="call-custRiskChkRelay-pro-api" doc:id="79757b23-a4d0-49cd-84a3-1472ddcad0b1" >
 		<logger level="INFO" doc:name="Start-custRiskChkRelay" doc:id="c9e1972a-29b2-428c-a309-9e2375e009af" message="Start-custRiskChkRelay"/>
-		<set-payload value='#[{&#10;	"trs_id": uuid(),&#10;	"if_id": "DK_IF_E1009_CS001_MD001",&#10;	"if_nm": "고객 Risk 체크 전달",&#10;	"start_dtm": now()&#10;}]' doc:name="Set Call API payload" doc:id="7902e668-e761-4227-b2e6-4ffa01576bac" />
-		<http:request method="GET" doc:name="Request" doc:id="865825f6-2a2b-4b07-9c27-b081daa0b1c2" config-ref="custRiskChk-pro-httpRequestConfig" path="/">
-			<http:uri-params><![CDATA[#[output application/java
+		<set-variable value="#[{&#10; 	&quot;start_dtm&quot;: now() as String {format: &quot;y-MM-dd&quot;} ++ 'T' ++ now() as String {format: &quot;HH:mm:ss&quot;},&#10; 	&quot;trs_id&quot;: uuid(),&#10; 	&quot;if_id&quot;: &quot;DK_IF_E1008_CS001_MD001&quot;,&#10;	&quot;if_nm&quot;: &quot;고객 Risk 체크 전달&quot;,&#10;}]" doc:name="Set Variable" doc:id="d2540c38-3668-483d-a41d-4bf70e0d3253" variableName="basePrarm"/>
+		<http:request method="GET" doc:name="Request" doc:id="d3ac269b-458a-4d35-8026-f2a893f9831f" config-ref="custRiskChk-pro-httpRequestConfig" path="/custRiskChkRelay">
+			<http:uri-params ><![CDATA[#[output application/java
 ---
 {
-	"version" : attributes.version
+	"version" : "v1"
 }]]]></http:uri-params>
+			<http:query-params ><![CDATA[#[output application/java
+---
+{
+	"start_dtm" : vars.basePrarm.start_dtm,
+	"if_nm" : vars.basePrarm.if_nm,
+	"if_id" : vars.basePrarm.if_id
+}]]]></http:query-params>
 		</http:request>
+		<logger level="INFO" doc:name="end request" doc:id="764f96f9-dca3-4213-82c4-ddd7a42ba68d" message="#[payload]"/>
+		<choice doc:name="Choice" doc:id="142b8ae1-c997-48db-be79-cc8547b0f795" >
+			<when expression='#[payload.responseStatus == "SUCCESS"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="18b1d854-58ba-413d-8648-08554755fd51" message="SUCCESS!!!!!!!!!!!!!!"/>
+				<set-variable doc:name="Set Variable" doc:id="785019fb-1741-4925-9108-7ed79f46e347" variableName="ifStatus" value="SUCCESS"/>
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Logger" doc:id="c1960b97-c036-463a-b78d-2205f242c747" message="FAIL!!!!!!!!!!!!!!!!!!!!!!!!!!"/>
+				<set-variable value="ERROR" doc:name="Set Variable" doc:id="2116880d-7d45-4efd-b3fb-815de44e40c8" variableName="ifStatus" />
+			</otherwise>
+		</choice>
+		<set-payload value='#[output application/json&#10;---&#10;{&#10;	"trs_id": vars.basePrarm.trs_id,&#10;	"if_id": vars.basePrarm.if_id,&#10;	"if_nm": vars.basePrarm.if_nm,&#10;	"start_dtm": vars.basePrarm.start_dtm,&#10;	"end_dtm": payload.end_dtm,&#10;	"responseStatus": vars.ifStatus,&#10;	"message": ""&#10;}]' doc:name="Set Payload" doc:id="8cead7e6-9e0c-4641-8917-f6688a4ee10f" />
+		<flow-ref doc:name="save interface log" doc:id="b5870431-ca34-44b2-9d15-6a6c40fdb89f" name="call-dbServer-sys-api"/>
 	</flow>
 	<flow name="call-dbServer-sys-api" doc:id="3f2a49c3-0ffd-42c4-a444-7e01e7ee14c0" >
 		<logger level="INFO" doc:name="Stert-dbServer-sys-api" doc:id="20cc8bf4-8a5d-4d8d-bbc2-01821779988a" message="#[payload]" />

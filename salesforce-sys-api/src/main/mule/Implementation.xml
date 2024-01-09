@@ -6,7 +6,7 @@
 http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<flow name="getCustRisk" doc:id="b75ff4c8-5c64-4fe6-93af-9ff9be80b7b9" >
-		<logger level="INFO" doc:name="Logger" doc:id="e5020b93-dd26-442d-8c93-f3ac16a24fae" message='"오긴함??"'/>
+		<logger level="INFO" doc:name="Logger" doc:id="e5020b93-dd26-442d-8c93-f3ac16a24fae" message='CustRiskChk Start'/>
 		<salesforce:query-xml-stream doc:name="Query xml stream" doc:id="9caa1417-9161-4c28-a0e1-c8dec23fa539" config-ref="Salesforce_Config">
 			<salesforce:salesforce-query ><![CDATA[select cust_id__c, cust_nm__c, pred_ym__c, ma_id__c, ma_nm__c from CustRisk__c]]></salesforce:salesforce-query>
 		</salesforce:query-xml-stream>
@@ -16,11 +16,11 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 output application/json
 ---
 payload map ( payload01 , indexOfPayload01 ) -> {
-	cust_id__c: payload01.payload.records.cust_id__c default "",
-	cust_nm__c: payload01.payload.records.cust_nm__c default "",
-	pred_ym__c: payload01.payload.records.ma_id__c default "",
-	ma_id__c: payload01.payload.records.ma_nm__c default "",
-	ma_nm__c: payload01.payload.records.pred_ym__c as String default ""
+	cust_id__c: payload01.payload.records.cust_id__c as String default "",
+	cust_nm__c: payload01.payload.records.cust_nm__c as String default "",
+	pred_ym__c: payload01.payload.records.pred_ym__c as String default "",
+	ma_id__c: payload01.payload.records.ma_id__c as String default "",
+	ma_nm__c: payload01.payload.records.ma_nm__c as String default ""
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>

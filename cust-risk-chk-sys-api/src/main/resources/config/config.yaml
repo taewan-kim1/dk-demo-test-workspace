@@ -1,0 +1,13 @@
+# Common properties shared across all environments
+api:
+  name: "${project.artifactId}"
+  version: "${project.version}"
+  autodiscoveryID: "00000000"
+
+amazon:
+  s3:
+    accessKey: "AKIAQ2C53YWR226FMAF6"
+    secretKey: "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"
+    roleArn: ""
+    region: "us-east-2"
+    bucketNm: "mulesofts3"

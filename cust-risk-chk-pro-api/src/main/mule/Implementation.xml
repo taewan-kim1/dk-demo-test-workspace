@@ -1,19 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
-	xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:volante="http://www.mulesoft.org/schema/mule/volante" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/volante http://www.mulesoft.org/schema/mule/volante/current/mule-volante.xsd">
 	<flow name="custRiskChkRelay" doc:id="235903ee-799c-45b6-96a0-0b3904c15b86" >
-		<logger level="INFO" doc:name="Logger" doc:id="27d4297b-8d34-49a2-99bb-0fd7306bb6ce" message="#[payload]"/>
-		<http:request method="GET" doc:name="Request" doc:id="dcedb626-d7db-464c-8580-79df4809ed04" config-ref="salseforce_sys_api_Request_configuration" path="/getCustRisk">
+		<logger level="INFO" doc:name="in Payload" doc:id="27d4297b-8d34-49a2-99bb-0fd7306bb6ce" message="#[payload]"/>
+		<set-variable value="#[attributes.queryParams]" doc:name="Set Variable" doc:id="0f97b0d6-2f1a-4be4-9acd-e2e64e75cd62" variableName="queryParam"/>
+		<http:request method="GET" doc:name="get custRiskChk" doc:id="dcedb626-d7db-464c-8580-79df4809ed04" config-ref="salseforce_sys_api_Request_configuration" path="/getCustRisk">
 			<http:uri-params><![CDATA[#[output application/java
 ---
 {
 	"version" : "v1"
 }]]]></http:uri-params>
 		</http:request>
-		<logger level="INFO" doc:name="Logger" doc:id="0c63c675-aea3-4349-81cf-1313134b6b6d" message="#[payload]" />
+		<logger level="INFO" doc:name="request Payload" doc:id="2759d676-b556-40ce-a85a-42fcd1f73834" message="#[payload]" />
+		<batch:job jobName="custRiskUpToCsvBatch" doc:id="15869c1d-38fd-4798-b7a7-c8b699912396">
+			<batch:process-records>
+				<batch:step name="Batch_Step" doc:id="6719bd42-83ef-40f5-a729-26bc31cf22d3">
+					<logger level="INFO" doc:name="Logger" doc:id="cbe3742a-f087-417b-80c4-d3a767424c70" message="#[payload]" />
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="d5fe41c5-af40-42a9-90ef-efa00e19b443" size="1000">
+						<ee:transform doc:name="byte to json" doc:id="2fa26348-41da-476f-8e90-4b8a6a045107">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload map read($)]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+						<logger level="INFO" doc:name="trancePayload" doc:id="95e549a5-83f0-484a-8de7-8286a6c94899" message="#[payload]" />
+						<http:request method="PUT" doc:name="Request putCustRiskCSV" doc:id="dac3fc28-356f-4644-b478-8553d22acf16" config-ref="custRiskChk_sys_api_Request_configuration" path="/putCustRiskCSV">
+							<http:uri-params><![CDATA[#[output application/java
+---
+{
+	"version" : "v1"
+}]]]></http:uri-params>
+						</http:request>
+						<logger level="INFO" doc:name="endRequest" doc:id="cdb3d826-8c41-430e-bc3e-cea7a023a04e" message="#[payload]" />
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete>
+				<logger level="INFO" doc:name="Logger" doc:id="c7684ed4-cbcc-474d-9211-709043c6655d" message="#[payload]"/>
+			</batch:on-complete>
+		</batch:job>
+		<ee:transform doc:name="Transform Message" doc:id="ece24569-1756-4124-a7dc-2c8e8d9dbc40">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"if_id": vars.queryParams.if_id,
+  	"if_nm": vars.queryParams.if_nm,
+  	"responseStatus": "SUCCESS",
+  	"resultMessage": "",
+  	"end_dtm": now() as String {format: "y-MM-dd"} ++ 'T' ++ now() as String {format: "HH:mm:ss"}
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
 	</flow>
 </mule>

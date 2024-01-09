@@ -7,19 +7,19 @@ api:
 # call fsOilInfo API
 req-fsOilInfo-pro-api:
   host: "localhost"
-  port: "8080"
+  port: "8081"
   base-path: "/api/${project.version}"
 
 # call chdSchInfo API
 req-chdSchInfo-pro-api:
   host: "localhost"
-  port: "8080"
+  port: "8081"
   base-path: "/api/${project.version}"
 
 # call pdpMilInfo API
 req-pdpMilInfo-pro-api:
   host: "localhost"
-  port: "8080"
+  port: "8081"
   base-path: "/api/${project.version}"
 
 # call custRiskChk API
@@ -31,7 +31,7 @@ req-custRiskChk-pro-api:
 # call batchInfo sys API
 req-dbServer-sys-api:
   host: "localhost"
-  port: "8080"
+  port: "8081"
   base-path: "/api/${project.version}"
        
 # Common configuration   

@@ -9,4 +9,11 @@
         </http:request-connection>
     </http:request-config>
     <configuration-properties doc:name="Configuration properties" doc:id="391e2795-7eda-460a-b211-0cbb711fb58d" file="config\config.yaml" />
+	<http:request-config name="custRiskChk_sys_api_Request_configuration" doc:name="HTTP Request configuration" doc:id="6ba833b0-05aa-49a7-b859-26360c0f1ea0" basePath="/api/custRiskChkSys/v1" >
+		<http:request-connection host="${req-custRiskChk-sys-api.host}" port="${req-custRiskChk-sys-api.port}" connectionIdleTimeout="${connection.idle-timeout}">
+			<reconnection failsDeployment="true" >
+				<reconnect frequency="${connection.frequency}" count="${connection.attempts}" />
+			</reconnection>
+		</http:request-connection>
+	</http:request-config>
 </mule>

@@ -49,7 +49,7 @@ output application/java
 		<try doc:name="Insert into tb_m_interface_log" doc:id="795b0e5b-c570-46f9-9b1d-266de29f6cc4" >
 			<db:insert doc:name="Insert" doc:id="d074ce78-5887-46fb-b4da-4799ba3f1add" config-ref="Database_Config">
 				<db:sql ><![CDATA[INSERT INTO mulesoft.tb_m_interface_log(
-trs_id,if_id,start_dtm,end_dtm,if_method,req_body,res_body,create_date)
+trs_id,if_id,start_dt,end_dt,if_method,req_body,res_body,create_date)
 VALUES
 (:trs_id,:if_id,:start_dtm,:end_dtm,:if_method,:req_body,:res_body,NOW())]]></db:sql>
 				<db:input-parameters ><![CDATA[#[{trs_id: payload.trs_id, if_id: payload.if_id, start_dtm: payload.start_dtm, end_dtm: payload.end_dtm, if_method: payload.if_method, req_body: payload.req_body, res_body: payload.res_body}]]]></db:input-parameters>

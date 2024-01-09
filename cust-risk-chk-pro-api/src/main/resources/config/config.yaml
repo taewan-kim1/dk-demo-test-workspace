@@ -14,4 +14,10 @@ connection:
 req-salseforce-sys-api:
   host: "localhost"
   port: "8081"
-  base-patch: "/test1/${project.version}"
+  base-patch: "/api/salesforceSys/${project.version}"
+
+# call salesforce sys API
+req-custRiskChk-sys-api:
+  host: "localhost"
+  port: "8081"
+  base-patch: "/api/custRiskChkSys/${project.version}"
